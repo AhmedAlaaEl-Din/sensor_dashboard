@@ -21,3 +21,4 @@
 | 17 | Default host is `127.0.0.1`. | Works over USB with `adb reverse`; no LAN exposure. |
 | 18 | INTERNET permission is added to the main manifest; the label is "Sensor Dashboard". | Flutter only adds it to debug/profile manifests; release builds would otherwise fail to connect. |
 | 19 | Raw exceptions go to `debugPrint` only; the UI shows mapped, friendly messages. | Brief: no raw exceptions on screen. |
+| 20 | `kotlin.incremental=false` in app/android/gradle.properties. | The first APK build failed: Kotlin incremental caches can't span drives (project on E:, pub cache on C:). Costs a little build speed only. |
