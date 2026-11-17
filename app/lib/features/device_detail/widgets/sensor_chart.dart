@@ -100,6 +100,9 @@ class SensorChart extends StatelessWidget {
                 sideTitles: SideTitles(
                   showTitles: true,
                   reservedSize: 48,
+                  // Edge labels overlap the regular grid labels; skip them.
+                  minIncluded: false,
+                  maxIncluded: false,
                   getTitlesWidget: (v, meta) => SideTitleWidget(
                     meta: meta,
                     child: Text(

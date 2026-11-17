@@ -63,17 +63,20 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
       children: [
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: SegmentedButton<SensorType>(
-            showSelectedIcon: false,
-            segments: [
-              for (final s in SensorType.values)
-                ButtonSegment(value: s, label: Text(s.label), tooltip: s.label),
-            ],
-            selected: {_sensor},
-            onSelectionChanged: (sel) => setState(() => _sensor = sel.first),
-          ),
+        // Chips wrap onto a second line on narrow phones instead of clipping.
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            for (final s in SensorType.values)
+              ChoiceChip(
+                key: Key('sensor-chip-${s.key}'),
+                label: Text(s.label),
+                selected: _sensor == s,
+                showCheckmark: false,
+                onSelected: (_) => setState(() => _sensor = s),
+              ),
+          ],
         ),
         const SizedBox(height: 16),
         Row(
