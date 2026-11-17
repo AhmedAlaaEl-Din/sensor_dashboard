@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(flutter analyze:*)",
+      "Bash(flutter test:*)",
+      "Bash(flutter pub get:*)",
+      "Bash(flutter devices:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Bash(adb devices:*)",
+      "Bash(adb reverse:*)",
+      "Bash(adb exec-out screencap:*)",
+      "Bash(adb shell screencap:*)",
+      "Bash(scrcpy:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ],
+    "ask": [
+      "Bash(git push:*)"
+    ],
+    "deny": [
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Bash(cat:*.env)",
+      "Bash(cat:*.env.*)"
+    ]
+  }
+}

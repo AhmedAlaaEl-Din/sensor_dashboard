@@ -1,0 +1,21 @@
+# Evidence and recordings (never committed)
+demo_videos/
+evidence/
+
+# Secrets
+.env
+.env.*
+
+# Node
+node_modules/
+npm-debug.log*
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.iml
+
+# Claude local settings
+.claude/settings.local.json
