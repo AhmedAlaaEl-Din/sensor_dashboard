@@ -8,3 +8,4 @@ _(Filled in at the end of the run.)_
 - 2026-11-17 08:14: Created the git repo on branch `phase1-foundation`, plus CLAUDE.md, .claude/settings.json and .gitignore.
 - 2026-11-17 08:20: Finished the broker (aedes, bound to 127.0.0.1 only), the simulator (3 devices, random walk, spikes, retained status) and the spike command. `npm test` passes 3/3 smoke tests. A manual CLI check confirmed the listener is on 127.0.0.1:18830 only.
 - 2026-11-17 08:55: Finished the Flutter app scaffold and all features: dashboard, detail chart, alerts, connection bar, settings, themes. `flutter analyze` is clean.
+- 2026-11-17 09:15: Tests added: unit tests (parser, stats/store, alert engine/controller, connection controller with fake_async) and widget tests (loading, empty, error, live cards, alert banner, offline, detail, dark theme). `flutter test` passes 49/49 and `flutter analyze` is clean. Fixed a gauge text overflow at large font sizes with FittedBox.

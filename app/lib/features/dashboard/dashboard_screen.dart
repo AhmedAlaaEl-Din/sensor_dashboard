@@ -33,8 +33,9 @@ class DashboardScreen extends StatelessWidget {
               label: Text('$activeCount'),
               child: const Icon(Icons.notifications_outlined),
             ),
-            onPressed: () => Navigator.of(context)
-                .push(MaterialPageRoute<void>(builder: (_) => const AlertsScreen())),
+            onPressed: () =>
+                Navigator.of(context)
+                    .push(MaterialPageRoute<void>(builder: (_) => const AlertsScreen())),
           ),
           IconButton(
             key: const Key('open-settings'),
@@ -54,8 +55,8 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  static void openSettings(BuildContext context) => Navigator.of(context)
-      .push(MaterialPageRoute<void>(builder: (_) => const SettingsScreen()));
+  static void openSettings(BuildContext context) =>
+      Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SettingsScreen()));
 }
 
 class _DashboardBody extends StatelessWidget {
@@ -67,7 +68,8 @@ class _DashboardBody extends StatelessWidget {
     final connection = context.watch<ConnectionController>();
     final thresholds = context.watch<AlertsController>().thresholds;
     final prefix = TelemetryParser.normalizePrefix(
-        context.select<SettingsController, String>((s) => s.settings.topicPrefix));
+      context.select<SettingsController, String>((s) => s.settings.topicPrefix),
+    );
 
     if (store.isEmpty) {
       switch (connection.status) {
@@ -81,7 +83,8 @@ class _DashboardBody extends StatelessWidget {
             icon: Icons.cloud_off_outlined,
             isError: true,
             title: "Can't connect to the broker",
-            body: connection.errorMessage ??
+            body:
+                connection.errorMessage ??
                 'The broker at ${connection.brokerLabel} is not reachable.',
             actions: [
               FilledButton.icon(
@@ -101,7 +104,8 @@ class _DashboardBody extends StatelessWidget {
             key: const Key('dashboard-empty'),
             icon: Icons.sensors_outlined,
             title: 'Connected. Waiting for sensor data',
-            body: 'Listening on "$prefix/+/telemetry". Start the simulator with '
+            body:
+                'Listening on "$prefix/+/telemetry". Start the simulator with '
                 '"npm run simulate" in the broker folder.',
           );
       }
@@ -120,9 +124,8 @@ class _DashboardBody extends StatelessWidget {
             device: d,
             thresholds: thresholds,
             live: connection.isConnected,
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(builder: (_) => DeviceDetailScreen(deviceId: d.id)),
-            ),
+            onTap: () => Navigator.of(context)
+                .push(MaterialPageRoute<void>(builder: (_) => DeviceDetailScreen(deviceId: d.id))),
           );
         },
       ),

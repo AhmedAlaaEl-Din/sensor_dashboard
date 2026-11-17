@@ -5,7 +5,7 @@ import 'settings_repository.dart';
 
 class SettingsController extends ChangeNotifier {
   SettingsController(this._repository, [AppSettings initial = const AppSettings()])
-      : _settings = initial;
+    : _settings = initial;
 
   final SettingsRepository _repository;
   AppSettings _settings;

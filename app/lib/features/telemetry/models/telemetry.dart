@@ -2,11 +2,7 @@ import 'sensor_type.dart';
 
 /// One telemetry reading from a device. Any sensor may be missing.
 class Telemetry {
-  const Telemetry({
-    required this.deviceId,
-    required this.timestamp,
-    required this.values,
-  });
+  const Telemetry({required this.deviceId, required this.timestamp, required this.values});
 
   final String deviceId;
   final DateTime timestamp;

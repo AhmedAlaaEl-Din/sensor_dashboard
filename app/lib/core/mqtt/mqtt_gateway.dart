@@ -46,11 +46,7 @@ class MqttClientGateway implements MqttGateway {
   Stream<void> get connectionLost => _lost.stream;
 
   @override
-  Future<void> connect({
-    required String host,
-    required int port,
-    required String clientId,
-  }) async {
+  Future<void> connect({required String host, required int port, required String clientId}) async {
     _teardownClient();
     _intentionalDisconnect = false;
 
@@ -58,9 +54,9 @@ class MqttClientGateway implements MqttGateway {
       ..logging(on: false)
       ..keepAlivePeriod = 10
       ..connectTimeoutPeriod = 4000
-      ..autoReconnect = false // ConnectionController owns reconnect + backoff.
-      ..connectionMessage =
-          MqttConnectMessage().withClientIdentifier(clientId).startClean();
+      ..autoReconnect =
+          false // ConnectionController owns reconnect + backoff.
+      ..connectionMessage = MqttConnectMessage().withClientIdentifier(clientId).startClean();
 
     client.onDisconnected = () {
       if (!_intentionalDisconnect && !_lost.isClosed) _lost.add(null);

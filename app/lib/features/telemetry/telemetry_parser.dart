@@ -31,7 +31,7 @@ class InvalidMessage extends ParsedMessage {
 /// Never throws: bad input becomes an [InvalidMessage].
 class TelemetryParser {
   const TelemetryParser({required this.prefix, DateTime Function()? clock})
-      : _clock = clock ?? DateTime.now;
+    : _clock = clock ?? DateTime.now;
 
   final String prefix;
   final DateTime Function() _clock;

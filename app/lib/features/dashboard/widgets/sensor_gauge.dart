@@ -40,13 +40,14 @@ class SensorGauge extends StatelessWidget {
     final color = dimmed
         ? scheme.outline
         : _breached
-            ? scheme.error
-            : scheme.primary;
+        ? scheme.error
+        : scheme.primary;
 
     final valueText = v == null ? '—' : v.toStringAsFixed(sensor.decimals);
 
     return Semantics(
-      label: '${sensor.label} ${v == null ? 'no data' : sensor.format(v)}'
+      label:
+          '${sensor.label} ${v == null ? 'no data' : sensor.format(v)}'
           '${_breached ? ', out of range' : ''}',
       excludeSemantics: true,
       child: Column(
@@ -54,7 +55,7 @@ class SensorGauge extends StatelessWidget {
         children: [
           SizedBox(
             width: 92,
-            height: 62,
+            height: 68,
             child: CustomPaint(
               painter: _ArcPainter(
                 fraction: fraction,
@@ -62,21 +63,28 @@ class SensorGauge extends StatelessWidget {
                 track: scheme.surfaceContainerHighest,
               ),
               child: Padding(
-                padding: const EdgeInsets.only(top: 22),
-                child: Column(
-                  children: [
-                    Text(
-                      valueText,
-                      key: Key('gauge-${sensor.key}-value'),
-                      style: text.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: _breached && !dimmed ? scheme.error : null,
-                        fontFeatures: const [FontFeature.tabularFigures()],
+                padding: const EdgeInsets.fromLTRB(14, 18, 14, 4),
+                // Scales down instead of overflowing with large system fonts.
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        valueText,
+                        key: Key('gauge-${sensor.key}-value'),
+                        style: text.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: _breached && !dimmed ? scheme.error : null,
+                          fontFeatures: const [FontFeature.tabularFigures()],
+                        ),
                       ),
-                    ),
-                    Text(sensor.unit,
-                        style: text.labelSmall?.copyWith(color: scheme.onSurfaceVariant)),
-                  ],
+                      Text(
+                        sensor.unit,
+                        style: text.labelSmall?.copyWith(color: scheme.onSurfaceVariant),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

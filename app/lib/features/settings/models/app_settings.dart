@@ -45,8 +45,8 @@ class AppSettings {
   }
 
   Map<String, dynamic> thresholdsToJson() => {
-        for (final e in thresholds.entries) e.key.key: e.value.toJson(),
-      };
+    for (final e in thresholds.entries) e.key.key: e.value.toJson(),
+  };
 
   static Map<SensorType, SensorThreshold> thresholdsFromJson(Map<String, dynamic> json) {
     final result = Map<SensorType, SensorThreshold>.of(defaultThresholds);

@@ -31,11 +31,10 @@ class ConnectionController extends ChangeNotifier {
     required void Function(ParsedMessage message) onMessage,
     Duration Function(int failedAttempts)? backoff,
     String? clientId,
-  })  : _gateway = gateway, // ignore: prefer_initializing_formals
-        _onMessage = onMessage, // ignore: prefer_initializing_formals
-        _backoff = backoff ?? defaultBackoff,
-        _clientId = clientId ??
-            'sensor-dashboard-${Random().nextInt(1 << 32).toRadixString(16)}' {
+  }) : _gateway = gateway, // ignore: prefer_initializing_formals
+       _onMessage = onMessage, // ignore: prefer_initializing_formals
+       _backoff = backoff ?? defaultBackoff,
+       _clientId = clientId ?? 'sensor-dashboard-${Random().nextInt(1 << 32).toRadixString(16)}' {
     _messageSub = _gateway.messages.listen(_handleRaw);
     _lostSub = _gateway.connectionLost.listen((_) => _handleLost());
   }
@@ -71,8 +70,7 @@ class ConnectionController extends ChangeNotifier {
   DateTime? get nextRetryAt => _nextRetryAt;
   AppSettings? get settings => _settings;
   bool get isConnected => _status == ConnectionStatus.connected;
-  String get brokerLabel =>
-      _settings == null ? 'broker' : '${_settings!.host}:${_settings!.port}';
+  String get brokerLabel => _settings == null ? 'broker' : '${_settings!.host}:${_settings!.port}';
 
   /// Connect with [settings]; reconnects if already connected with different settings.
   Future<void> start(AppSettings settings) async {

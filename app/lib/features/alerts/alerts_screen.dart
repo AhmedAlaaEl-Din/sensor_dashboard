@@ -22,10 +22,7 @@ class AlertsScreen extends StatelessWidget {
         title: const Text('Alerts'),
         actions: [
           if (hasResolved)
-            TextButton(
-              onPressed: alerts.clearResolved,
-              child: const Text('Clear resolved'),
-            ),
+            TextButton(onPressed: alerts.clearResolved, child: const Text('Clear resolved')),
         ],
       ),
       body: history.isEmpty
@@ -33,7 +30,8 @@ class AlertsScreen extends StatelessWidget {
               key: Key('alerts-empty'),
               icon: Icons.notifications_none_outlined,
               title: 'No alerts yet',
-              body: 'You will see an alert here when a reading goes outside the '
+              body:
+                  'You will see an alert here when a reading goes outside the '
                   'thresholds set in Settings.',
             )
           : ListView.separated(

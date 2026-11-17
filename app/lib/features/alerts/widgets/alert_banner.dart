@@ -38,8 +38,9 @@ class AlertBanner extends StatelessWidget {
         key: const Key('alert-banner'),
         color: scheme.errorContainer,
         child: InkWell(
-          onTap: () => Navigator.of(context)
-              .push(MaterialPageRoute<void>(builder: (_) => const AlertsScreen())),
+          onTap: () =>
+              Navigator.of(context)
+                  .push(MaterialPageRoute<void>(builder: (_) => const AlertsScreen())),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 10, 4, 10),
             child: Row(

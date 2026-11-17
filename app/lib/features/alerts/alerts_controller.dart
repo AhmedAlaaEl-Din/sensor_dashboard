@@ -8,7 +8,7 @@ import 'models/alert_models.dart';
 /// Keeps the alert history and exposes active alerts to the UI.
 class AlertsController extends ChangeNotifier {
   AlertsController({Map<SensorType, SensorThreshold>? thresholds})
-      : _engine = AlertEngine(thresholds: thresholds);
+    : _engine = AlertEngine(thresholds: thresholds);
 
   static const int maxHistory = 200;
 
@@ -18,8 +18,7 @@ class AlertsController extends ChangeNotifier {
   /// Newest first.
   List<AlertEvent> get history => List.unmodifiable(_history);
 
-  List<AlertEvent> get activeAlerts =>
-      _history.where((a) => a.isActive).toList(growable: false);
+  List<AlertEvent> get activeAlerts => _history.where((a) => a.isActive).toList(growable: false);
 
   /// Active alerts the user has not dismissed from the banner.
   List<AlertEvent> get bannerAlerts =>

@@ -9,12 +9,7 @@ import '../../telemetry/models/telemetry.dart';
 
 /// Rolling line chart of the last readings (x = seconds before the newest).
 class SensorChart extends StatelessWidget {
-  const SensorChart({
-    super.key,
-    required this.sensor,
-    required this.history,
-    this.threshold,
-  });
+  const SensorChart({super.key, required this.sensor, required this.history, this.threshold});
 
   final SensorType sensor;
   final List<Telemetry> history;
@@ -41,10 +36,7 @@ class SensorChart extends StatelessWidget {
     final newest = points.last.timestamp;
     final spots = [
       for (final t in points)
-        FlSpot(
-          -newest.difference(t.timestamp).inMilliseconds / 1000.0,
-          t[sensor]!,
-        ),
+        FlSpot(-newest.difference(t.timestamp).inMilliseconds / 1000.0, t[sensor]!),
     ];
 
     // Y range: data plus threshold lines, with a little padding.
@@ -154,15 +146,15 @@ class SensorChart extends StatelessWidget {
   }
 
   HorizontalLine _thresholdLine(double y, Color color, String which) => HorizontalLine(
-        y: y,
-        color: color.withValues(alpha: 0.8),
-        strokeWidth: 1.5,
-        dashArray: const [6, 4],
-        label: HorizontalLineLabel(
-          show: true,
-          alignment: Alignment.topRight,
-          style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w600),
-          labelResolver: (_) => '$which ${y.toStringAsFixed(sensor.decimals)}',
-        ),
-      );
+    y: y,
+    color: color.withValues(alpha: 0.8),
+    strokeWidth: 1.5,
+    dashArray: const [6, 4],
+    label: HorizontalLineLabel(
+      show: true,
+      alignment: Alignment.topRight,
+      style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w600),
+      labelResolver: (_) => '$which ${y.toStringAsFixed(sensor.decimals)}',
+    ),
+  );
 }

@@ -22,8 +22,9 @@ class SensorDashboardApp extends StatelessWidget {
       ],
       child: Builder(
         builder: (context) {
-          final themeMode =
-              context.select<SettingsController, ThemeMode>((s) => s.settings.themeMode);
+          final themeMode = context.select<SettingsController, ThemeMode>(
+            (s) => s.settings.themeMode,
+          );
           return MaterialApp(
             title: 'Sensor Dashboard',
             debugShowCheckedModeBanner: false,

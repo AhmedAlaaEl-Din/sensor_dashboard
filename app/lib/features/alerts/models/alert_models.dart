@@ -12,7 +12,12 @@ class SensorThreshold {
   /// True when both bounds are set and min is not below max.
   bool get isInverted => min != null && max != null && min! >= max!;
 
-  SensorThreshold copyWith({double? min, double? max, bool clearMin = false, bool clearMax = false}) {
+  SensorThreshold copyWith({
+    double? min,
+    double? max,
+    bool clearMin = false,
+    bool clearMax = false,
+  }) {
     return SensorThreshold(
       min: clearMin ? null : (min ?? this.min),
       max: clearMax ? null : (max ?? this.max),
@@ -22,9 +27,9 @@ class SensorThreshold {
   Map<String, dynamic> toJson() => {'min': min, 'max': max};
 
   static SensorThreshold fromJson(Map<String, dynamic> json) => SensorThreshold(
-        min: (json['min'] as num?)?.toDouble(),
-        max: (json['max'] as num?)?.toDouble(),
-      );
+    min: (json['min'] as num?)?.toDouble(),
+    max: (json['max'] as num?)?.toDouble(),
+  );
 
   @override
   bool operator ==(Object other) =>

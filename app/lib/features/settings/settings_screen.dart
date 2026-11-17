@@ -49,8 +49,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _themeMode = s.themeMode;
   }
 
-  static String _trim(double v) =>
-      v == v.roundToDouble() ? v.toStringAsFixed(0) : v.toString();
+  static String _trim(double v) => v == v.roundToDouble() ? v.toStringAsFixed(0) : v.toString();
 
   @override
   void dispose() {
@@ -164,11 +163,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 12),
             for (final s in SensorType.values) ...[
-              _ThresholdRow(
-                sensor: s,
-                min: _limits[s]!.$1,
-                max: _limits[s]!.$2,
-              ),
+              _ThresholdRow(sensor: s, min: _limits[s]!.$1, max: _limits[s]!.$2),
               const SizedBox(height: 12),
             ],
             const SizedBox(height: 16),
@@ -177,17 +172,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
             SegmentedButton<ThemeMode>(
               segments: const [
                 ButtonSegment(
-                    value: ThemeMode.system,
-                    label: Text('System'),
-                    icon: Icon(Icons.brightness_auto_outlined)),
+                  value: ThemeMode.system,
+                  label: Text('System'),
+                  icon: Icon(Icons.brightness_auto_outlined),
+                ),
                 ButtonSegment(
-                    value: ThemeMode.light,
-                    label: Text('Light'),
-                    icon: Icon(Icons.light_mode_outlined)),
+                  value: ThemeMode.light,
+                  label: Text('Light'),
+                  icon: Icon(Icons.light_mode_outlined),
+                ),
                 ButtonSegment(
-                    value: ThemeMode.dark,
-                    label: Text('Dark'),
-                    icon: Icon(Icons.dark_mode_outlined)),
+                  value: ThemeMode.dark,
+                  label: Text('Dark'),
+                  icon: Icon(Icons.dark_mode_outlined),
+                ),
               ],
               selected: {_themeMode},
               onSelectionChanged: (v) => setState(() => _themeMode = v.first),
@@ -200,7 +198,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
         onPressed: saving ? null : _save,
         icon: saving
             ? const SizedBox(
-                width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
             : const Icon(Icons.save_outlined),
         label: const Text('Save'),
       ),

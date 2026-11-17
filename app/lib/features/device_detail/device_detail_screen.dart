@@ -40,12 +40,13 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
                 ? const MessageView(
                     icon: Icons.sensors_off_outlined,
                     title: 'Device not available',
-                    body: 'This device is no longer reporting. '
+                    body:
+                        'This device is no longer reporting. '
                         'It may be under a different topic prefix.',
                   )
                 : device.latest == null
-                    ? const LoadingView(message: 'Waiting for the first reading…')
-                    : _content(context, device, thresholds),
+                ? const LoadingView(message: 'Waiting for the first reading…')
+                : _content(context, device, thresholds),
           ),
         ],
       ),
@@ -130,11 +131,17 @@ class _StatsRow extends StatelessWidget {
     String f(double? v) => v == null ? '—' : sensor.format(v);
     return Row(
       children: [
-        Expanded(child: _StatTile(label: 'Min', value: f(stats?.min), keyName: 'stat-min')),
+        Expanded(
+          child: _StatTile(label: 'Min', value: f(stats?.min), keyName: 'stat-min'),
+        ),
         const SizedBox(width: 8),
-        Expanded(child: _StatTile(label: 'Average', value: f(stats?.average), keyName: 'stat-avg')),
+        Expanded(
+          child: _StatTile(label: 'Average', value: f(stats?.average), keyName: 'stat-avg'),
+        ),
         const SizedBox(width: 8),
-        Expanded(child: _StatTile(label: 'Max', value: f(stats?.max), keyName: 'stat-max')),
+        Expanded(
+          child: _StatTile(label: 'Max', value: f(stats?.max), keyName: 'stat-max'),
+        ),
       ],
     );
   }

@@ -17,7 +17,7 @@ class AlertChanges {
 /// hovers around a limit does not produce a flood of alerts.
 class AlertEngine {
   AlertEngine({Map<SensorType, SensorThreshold>? thresholds})
-      : _thresholds = Map.of(thresholds ?? defaultThresholds);
+    : _thresholds = Map.of(thresholds ?? defaultThresholds);
 
   Map<SensorType, SensorThreshold> _thresholds;
   final Map<(String, SensorType), AlertEvent> _active = {};

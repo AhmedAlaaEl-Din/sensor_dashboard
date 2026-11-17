@@ -41,11 +41,8 @@ class SharedPrefsSettingsRepository implements SettingsRepository {
             : AppSettings.defaultPrefix,
         thresholds: thresholdsJson == null
             ? const AppSettings().thresholds
-            : AppSettings.thresholdsFromJson(
-                jsonDecode(thresholdsJson) as Map<String, dynamic>),
-        themeMode: (themeIndex != null &&
-                themeIndex >= 0 &&
-                themeIndex < ThemeMode.values.length)
+            : AppSettings.thresholdsFromJson(jsonDecode(thresholdsJson) as Map<String, dynamic>),
+        themeMode: (themeIndex != null && themeIndex >= 0 && themeIndex < ThemeMode.values.length)
             ? ThemeMode.values[themeIndex]
             : ThemeMode.system,
       );

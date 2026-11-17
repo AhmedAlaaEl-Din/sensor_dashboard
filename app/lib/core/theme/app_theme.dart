@@ -28,6 +28,8 @@ class AppTheme {
 
 /// Status colours that stay readable in both themes.
 extension StatusColors on ColorScheme {
-  Color get ok => brightness == Brightness.light ? const Color(0xFF1B7F3B) : const Color(0xFF7DDB95);
-  Color get warn => brightness == Brightness.light ? const Color(0xFF8A5A00) : const Color(0xFFFFC66B);
+  Color get ok =>
+      brightness == Brightness.light ? const Color(0xFF1B7F3B) : const Color(0xFF7DDB95);
+  Color get warn =>
+      brightness == Brightness.light ? const Color(0xFF8A5A00) : const Color(0xFFFFC66B);
 }

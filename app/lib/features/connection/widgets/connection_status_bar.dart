@@ -40,29 +40,29 @@ class _ConnectionStatusBarState extends State<ConnectionStatusBar> {
 
     final (Color bg, Color fg, Widget leading, String label) = switch (c.status) {
       ConnectionStatus.connected => (
-          scheme.ok.withValues(alpha: 0.14),
-          scheme.ok,
-          Icon(Icons.cloud_done_outlined, size: 18, color: scheme.ok),
-          'Live · connected to ${c.brokerLabel}',
-        ),
+        scheme.ok.withValues(alpha: 0.14),
+        scheme.ok,
+        Icon(Icons.cloud_done_outlined, size: 18, color: scheme.ok),
+        'Live · connected to ${c.brokerLabel}',
+      ),
       ConnectionStatus.idle || ConnectionStatus.connecting => (
-          scheme.secondaryContainer,
-          scheme.onSecondaryContainer,
-          _spinner(scheme.onSecondaryContainer),
-          'Connecting to ${c.brokerLabel}…',
-        ),
+        scheme.secondaryContainer,
+        scheme.onSecondaryContainer,
+        _spinner(scheme.onSecondaryContainer),
+        'Connecting to ${c.brokerLabel}…',
+      ),
       ConnectionStatus.reconnecting => (
-          scheme.secondaryContainer,
-          scheme.onSecondaryContainer,
-          _spinner(scheme.onSecondaryContainer),
-          'Reconnecting to ${c.brokerLabel}…',
-        ),
+        scheme.secondaryContainer,
+        scheme.onSecondaryContainer,
+        _spinner(scheme.onSecondaryContainer),
+        'Reconnecting to ${c.brokerLabel}…',
+      ),
       ConnectionStatus.offline => (
-          scheme.errorContainer,
-          scheme.onErrorContainer,
-          Icon(Icons.cloud_off_outlined, size: 18, color: scheme.onErrorContainer),
-          'Offline · ${_retryLabel(c.nextRetryAt)}',
-        ),
+        scheme.errorContainer,
+        scheme.onErrorContainer,
+        Icon(Icons.cloud_off_outlined, size: 18, color: scheme.onErrorContainer),
+        'Offline · ${_retryLabel(c.nextRetryAt)}',
+      ),
     };
 
     return Semantics(
@@ -101,10 +101,10 @@ class _ConnectionStatusBarState extends State<ConnectionStatusBar> {
   }
 
   static Widget _spinner(Color color) => SizedBox(
-        width: 16,
-        height: 16,
-        child: CircularProgressIndicator(strokeWidth: 2, color: color),
-      );
+    width: 16,
+    height: 16,
+    child: CircularProgressIndicator(strokeWidth: 2, color: color),
+  );
 
   static String _retryLabel(DateTime? at) {
     if (at == null) return 'retrying soon';
