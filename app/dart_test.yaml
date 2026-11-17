@@ -1,0 +1,3 @@
+tags:
+  e2e:
+    # Needs the local Node broker + simulator on 127.0.0.1:1883; skips itself otherwise.

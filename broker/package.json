@@ -7,8 +7,9 @@
   "scripts": {
     "broker": "node src/broker.js",
     "simulate": "node src/simulator.js",
-    "test": "node --test test/",
-    "spike": "node src/spike.js"
+    "dev": "node src/dev.js",
+    "spike": "node src/spike.js",
+    "test": "node --test test/"
   },
   "engines": {
     "node": ">=20"
