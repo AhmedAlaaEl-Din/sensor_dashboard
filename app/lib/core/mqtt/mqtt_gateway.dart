@@ -56,6 +56,7 @@ class MqttClientGateway implements MqttGateway {
       ..connectTimeoutPeriod = 4000
       ..autoReconnect =
           false // ConnectionController owns reconnect + backoff.
+      ..setProtocolV311() // MQTT 3.1.1: longer client ids, wider broker support.
       ..connectionMessage = MqttConnectMessage().withClientIdentifier(clientId).startClean();
 
     client.onDisconnected = () {

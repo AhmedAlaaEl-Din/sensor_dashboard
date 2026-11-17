@@ -34,10 +34,15 @@ class ConnectionController extends ChangeNotifier {
   }) : _gateway = gateway, // ignore: prefer_initializing_formals
        _onMessage = onMessage, // ignore: prefer_initializing_formals
        _backoff = backoff ?? defaultBackoff,
-       _clientId = clientId ?? 'sensor-dashboard-${Random().nextInt(1 << 32).toRadixString(16)}' {
+       _clientId = clientId ?? generateClientId() {
     _messageSub = _gateway.messages.listen(_handleRaw);
     _lostSub = _gateway.connectionLost.listen((_) => _handleLost());
   }
+
+  /// MQTT 3.1 brokers may reject client ids longer than 23 characters, so keep
+  /// it short: "sdash-" + 8 hex digits = 14 characters.
+  static String generateClientId([Random? random]) =>
+      'sdash-${(random ?? Random()).nextInt(1 << 32).toRadixString(16).padLeft(8, '0')}';
 
   /// 1 s, 2 s, 4 s, 8 s, then every 10 s.
   static Duration defaultBackoff(int failedAttempts) =>
@@ -175,6 +180,12 @@ class ConnectionController extends ChangeNotifier {
       return 'The broker at $where refused the connection.';
     }
     final text = error.toString().toLowerCase();
+    if (text.contains('returncode') ||
+        text.contains('return code') ||
+        text.contains('rejected') ||
+        text.contains('notauthorized')) {
+      return 'The broker at $where refused the connection.';
+    }
     if (text.contains('socket') || text.contains('connection')) {
       return "Can't reach the broker at $where. Check that it is running and that "
           '`adb reverse tcp:${s.port} tcp:${s.port}` is active.';

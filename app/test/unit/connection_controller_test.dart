@@ -114,6 +114,26 @@ void main() {
     c.dispose();
   });
 
+  test('client id fits the MQTT 3.1 limit of 23 characters', () {
+    // Regression: "sensor-dashboard-<hex>" (25 chars) was rejected on a real phone
+    // with MqttConnectReturnCode.identifierRejected.
+    for (var i = 0; i < 200; i++) {
+      final id = ConnectionController.generateClientId();
+      expect(id.length, lessThanOrEqualTo(23));
+      expect(id, matches(RegExp(r'^sdash-[0-9a-f]{8}$')));
+    }
+  });
+
+  test('broker rejection is reported as refused, not unreachable', () {
+    final msg = ConnectionController.friendlyError(
+      Exception(
+        'NoConnectionException: The return code is MqttConnectReturnCode.identifierRejected',
+      ),
+      const AppSettings(),
+    );
+    expect(msg, 'The broker at 127.0.0.1:1883 refused the connection.');
+  });
+
   test('friendlyError never leaks exception text', () {
     const s = AppSettings();
     for (final e in [
