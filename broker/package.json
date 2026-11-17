@@ -1,0 +1,20 @@
+{
+  "name": "sensor-dashboard-broker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local-only aedes MQTT broker and simulated sensor telemetry publisher.",
+  "type": "commonjs",
+  "scripts": {
+    "broker": "node src/broker.js",
+    "simulate": "node src/simulator.js",
+    "test": "node --test test/",
+    "spike": "node src/spike.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "aedes": "1.2.0",
+    "mqtt": "5.16.1"
+  }
+}
