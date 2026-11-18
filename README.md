@@ -11,13 +11,15 @@ real credentials.
 
 > **Phase 1 demo video:** [Watch on YouTube](https://youtube.com/shorts/mwZjokxNZyg) (unlisted, 1:07, simulated data)
 >
-> **Phase 2 demo video:** _[link to be added]_
+> **Phase 2 demo video:** [Watch on YouTube](https://youtube.com/shorts/ILTFeyNIfLA) (unlisted, 1:28, simulated data)
 
-| Sign in | Dashboard | History | Export | Alert notification | Offline |
-|---------|-----------|---------|--------|--------------------|---------|
-| _screenshot_ | _screenshot_ | _screenshot_ | _screenshot_ | _screenshot_ | _screenshot_ |
+| Sign in (wrong password) | Live dashboard | History (24 h) | Export CSV |
+|:---:|:---:|:---:|:---:|
+| <img src="docs/screenshots/p2-01-login-error.png" width="190" alt="Login screen showing Wrong email or password"> | <img src="docs/screenshots/p2-02-dashboard.png" width="190" alt="Dashboard with live gauges"> | <img src="docs/screenshots/p2-03-history-24h.png" width="190" alt="Greenhouse history, 24 hours"> | <img src="docs/screenshots/p2-04-export.png" width="190" alt="CSV ready dialog"> |
+| **Profile (viewer)** | **Alert notification** | **Offline** | |
+| <img src="docs/screenshots/p2-05-profile-viewer.png" width="190" alt="Profile screen with the Viewer role"> | <img src="docs/screenshots/p2-06-notification.png" width="190" alt="Heads-up temperature alert notification"> | <img src="docs/screenshots/p2-07-offline.png" width="190" alt="Dashboard reconnecting with greyed-out values"> | |
 
-<!-- Replace with cropped images from evidence/screenshots/ once checked for anything personal. -->
+Screenshots from a Huawei phone (Android 8.1), status and navigation bars cropped; all data is simulated.
 
 ## Features
 

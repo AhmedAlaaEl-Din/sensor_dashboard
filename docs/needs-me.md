@@ -67,4 +67,4 @@ appeared in between. **Watch it once before publishing.** Full check:
 4. Check that the status bar is cropped off in the video and screenshots.
 
 ## P2-4. Review and merge
-All Phase 2 work is on the local branch `phase2-history-auth` (not pushed, not merged), as instructed.
+All Phase 2 work is on `phase2-history-auth`, pushed to GitHub on 2026-11-18 at your request, **not merged**.

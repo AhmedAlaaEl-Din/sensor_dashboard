@@ -1,5 +1,11 @@
 # Progress log
 
+## Phase 2 video, screenshots, push (2026-11-18, 21:10)
+
+- Uploaded `demo_videos/sensor_phase2_final.mp4` (your edit, 1:28, 720×1384) to YouTube as **unlisted**, not made for kids, title "sensor phase2 final", no description: https://youtube.com/shorts/ILTFeyNIfLA. Checks: no issues. Confirmed Unlisted in YouTube Studio → Content → Shorts.
+- README: Phase 2 video link and the 7 cropped screenshots (copied from git-ignored `evidence/screenshots/` to `docs/screenshots/` so GitHub can show them).
+- Pushed `phase2-history-auth` to origin at the owner's request (not merged).
+
 ## Phase 2 follow-up: seed, re-recorded demo, MQTT reconnect fix (2026-11-18, 20:30–21:00)
 
 **Status:** done. Branch `phase2-history-auth`, **not pushed or merged**. API **33/33**, Flutter `analyze` clean, **86/86** tests.
