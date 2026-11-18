@@ -5,6 +5,7 @@ import '../../core/widgets/state_views.dart';
 import '../alerts/alerts_controller.dart';
 import '../alerts/alerts_screen.dart';
 import '../alerts/widgets/alert_banner.dart';
+import '../auth/profile_screen.dart';
 import '../connection/connection_controller.dart';
 import '../connection/widgets/connection_status_bar.dart';
 import '../device_detail/device_detail_screen.dart';
@@ -36,6 +37,14 @@ class DashboardScreen extends StatelessWidget {
             onPressed: () =>
                 Navigator.of(context)
                     .push(MaterialPageRoute<void>(builder: (_) => const AlertsScreen())),
+          ),
+          IconButton(
+            key: const Key('open-profile'),
+            tooltip: 'Profile',
+            icon: const Icon(Icons.account_circle_outlined),
+            onPressed: () =>
+                Navigator.of(context)
+                    .push(MaterialPageRoute<void>(builder: (_) => const ProfileScreen())),
           ),
           IconButton(
             key: const Key('open-settings'),
@@ -105,8 +114,8 @@ class _DashboardBody extends StatelessWidget {
             icon: Icons.sensors_outlined,
             title: 'Connected. Waiting for sensor data',
             body:
-                'Listening on "$prefix/+/telemetry". Start the simulator with '
-                '"npm run simulate" in the broker folder.',
+                'No sensors have reported yet in the "$prefix" group. They appear here '
+                'as soon as they send data.',
           );
       }
     }

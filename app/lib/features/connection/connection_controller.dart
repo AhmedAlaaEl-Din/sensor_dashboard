@@ -31,8 +31,8 @@ class ConnectionController extends ChangeNotifier {
     required void Function(ParsedMessage message) onMessage,
     Duration Function(int failedAttempts)? backoff,
     String? clientId,
-  }) : _gateway = gateway, // ignore: prefer_initializing_formals
-       _onMessage = onMessage, // ignore: prefer_initializing_formals
+  }) : _gateway = gateway,
+       _onMessage = onMessage,
        _backoff = backoff ?? defaultBackoff,
        _clientId = clientId ?? generateClientId() {
     _messageSub = _gateway.messages.listen(_handleRaw);
@@ -89,6 +89,18 @@ class ConnectionController extends ChangeNotifier {
     _failedAttempts = 0;
     _errorMessage = null;
     await _attempt(ConnectionStatus.connecting);
+  }
+
+  /// Disconnects and stops retrying (for example after sign-out).
+  void stop() {
+    _generation++;
+    _cancelRetry();
+    _gateway.disconnect();
+    _settings = null;
+    _parser = null;
+    _failedAttempts = 0;
+    _errorMessage = null;
+    _setStatus(ConnectionStatus.idle);
   }
 
   /// Skip the backoff wait and try now.
@@ -170,8 +182,8 @@ class ConnectionController extends ChangeNotifier {
   static String friendlyError(Object error, AppSettings s) {
     final where = '${s.host}:${s.port}';
     if (error is SocketException) {
-      return "Can't reach the broker at $where. Check that it is running and that "
-          '`adb reverse tcp:${s.port} tcp:${s.port}` is active.';
+      return "Can't reach the live data server at $where. Check that it is running and "
+          'that the phone is connected.';
     }
     if (error is TimeoutException) {
       return 'The broker at $where did not answer in time.';
@@ -187,8 +199,8 @@ class ConnectionController extends ChangeNotifier {
       return 'The broker at $where refused the connection.';
     }
     if (text.contains('socket') || text.contains('connection')) {
-      return "Can't reach the broker at $where. Check that it is running and that "
-          '`adb reverse tcp:${s.port} tcp:${s.port}` is active.';
+      return "Can't reach the live data server at $where. Check that it is running and "
+          'that the phone is connected.';
     }
     return "Couldn't connect to the broker at $where.";
   }

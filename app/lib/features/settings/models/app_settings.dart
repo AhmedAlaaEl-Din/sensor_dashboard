@@ -9,18 +9,24 @@ class AppSettings {
     this.host = defaultHost,
     this.port = defaultPort,
     this.topicPrefix = defaultPrefix,
+    this.apiUrl = defaultApiUrl,
     this.thresholds = defaultThresholds,
     this.themeMode = ThemeMode.system,
   });
 
-  /// 127.0.0.1 works on a USB phone thanks to `adb reverse tcp:1883 tcp:1883`.
+  /// 127.0.0.1 works on a USB phone because `adb reverse` forwards the ports
+  /// over the cable (see README).
   static const String defaultHost = '127.0.0.1';
   static const int defaultPort = 1883;
   static const String defaultPrefix = 'sensors';
+  static const String defaultApiUrl = 'http://127.0.0.1:3000';
 
   final String host;
   final int port;
   final String topicPrefix;
+
+  /// Base URL of the history/login API.
+  final String apiUrl;
   final Map<SensorType, SensorThreshold> thresholds;
   final ThemeMode themeMode;
 
@@ -32,6 +38,7 @@ class AppSettings {
     String? host,
     int? port,
     String? topicPrefix,
+    String? apiUrl,
     Map<SensorType, SensorThreshold>? thresholds,
     ThemeMode? themeMode,
   }) {
@@ -39,6 +46,7 @@ class AppSettings {
       host: host ?? this.host,
       port: port ?? this.port,
       topicPrefix: topicPrefix ?? this.topicPrefix,
+      apiUrl: apiUrl ?? this.apiUrl,
       thresholds: thresholds ?? this.thresholds,
       themeMode: themeMode ?? this.themeMode,
     );
@@ -68,6 +76,18 @@ class SettingsValidator {
     final v = value?.trim() ?? '';
     if (v.isEmpty) return 'Enter the broker host, for example 127.0.0.1';
     if (!_hostPattern.hasMatch(v)) return 'Use letters, digits, dots, dashes or colons only';
+    return null;
+  }
+
+  static String? apiUrl(String? value) {
+    final v = value?.trim() ?? '';
+    final uri = Uri.tryParse(v);
+    if (v.isEmpty ||
+        uri == null ||
+        !(uri.isScheme('http') || uri.isScheme('https')) ||
+        uri.host.isEmpty) {
+      return 'Enter an address like http://127.0.0.1:3000';
+    }
     return null;
   }
 

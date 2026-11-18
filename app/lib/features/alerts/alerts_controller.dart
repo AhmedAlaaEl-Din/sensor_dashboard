@@ -13,6 +13,9 @@ class AlertsController extends ChangeNotifier {
   static const int maxHistory = 200;
 
   final AlertEngine _engine;
+
+  /// Called once per newly triggered alert (used for system notifications).
+  void Function(AlertEvent alert)? onTriggered;
   final List<AlertEvent> _history = [];
 
   /// Newest first.
@@ -36,6 +39,7 @@ class AlertsController extends ChangeNotifier {
     if (changes.isEmpty) return;
     for (final e in changes.triggered) {
       _history.insert(0, e);
+      onTriggered?.call(e);
     }
     if (_history.length > maxHistory) {
       _history.removeRange(maxHistory, _history.length);

@@ -2,27 +2,14 @@ import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:sensor_dashboard/app/app.dart';
 import 'package:sensor_dashboard/app/app_services.dart';
-import 'package:sensor_dashboard/features/settings/settings_repository.dart';
 
+import '../helpers/app_harness.dart' as harness;
 import '../helpers/fake_gateway.dart';
 
-/// Builds the real app around a fake MQTT gateway.
 Future<(AppServices, FakeGateway)> pumpApp(WidgetTester tester, {FakeGateway? gateway}) async {
-  final gw = gateway ?? FakeGateway();
-  final services = AppServices(
-    gateway: gw,
-    repository: InMemorySettingsRepository(),
-    backoff: (_) => const Duration(seconds: 30),
-  );
-  addTearDown(services.dispose);
-  await tester.binding.setSurfaceSize(const Size(420, 900));
-  addTearDown(() => tester.binding.setSurfaceSize(null));
-  await tester.pumpWidget(SensorDashboardApp(services: services));
-  unawaited(services.start());
-  await tester.pump();
-  return (services, gw);
+  final h = await harness.pumpApp(tester, gateway: gateway);
+  return (h.services, h.gateway);
 }
 
 Map<String, Object?> normal({double temperature = 24.3}) => {
@@ -50,7 +37,7 @@ void main() {
     await tester.pump();
 
     expect(find.byKey(const Key('dashboard-empty')), findsOneWidget);
-    expect(find.textContaining('sensors/+/telemetry'), findsOneWidget);
+    expect(find.textContaining('No sensors have reported yet'), findsOneWidget);
     expect(find.textContaining('Live · connected to 127.0.0.1:1883'), findsOneWidget);
   });
 
@@ -61,7 +48,8 @@ void main() {
 
     expect(find.byKey(const Key('dashboard-error')), findsOneWidget);
     expect(find.text("Can't connect to the broker"), findsOneWidget);
-    expect(find.textContaining('adb reverse'), findsOneWidget);
+    expect(find.textContaining('the phone is connected'), findsOneWidget);
+    expect(find.textContaining('adb'), findsNothing); // developer hints live in the README
     expect(find.textContaining('Offline'), findsOneWidget);
     // No raw exception text anywhere.
     expect(find.textContaining('SocketException'), findsNothing);
