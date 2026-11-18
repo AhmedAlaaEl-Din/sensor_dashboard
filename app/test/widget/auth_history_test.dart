@@ -63,7 +63,7 @@ void main() {
     await tester.tap(find.byKey(const Key('open-history')));
     await tester.pumpAndSettle(const Duration(milliseconds: 100));
 
-    expect(find.text('Greenhouse history'), findsOneWidget);
+    expect(find.text('History'), findsOneWidget);
     expect(find.text('19.5 °C'), findsOneWidget); // min from stats
     expect(find.text('22.9 °C'), findsOneWidget); // avg
     expect(h.api.requests.last.url.queryParameters['bucket'], '1m');

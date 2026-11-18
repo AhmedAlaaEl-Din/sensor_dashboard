@@ -92,7 +92,20 @@ class _HistoryScreenState extends State<HistoryScreen> {
         final c = _controller;
         return Scaffold(
           appBar: AppBar(
-            title: Text('${displayNameFor(widget.deviceId)} history'),
+            // Two short lines instead of "<Device> history", which was cut off on a
+            // 360 dp phone next to the Export button.
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(displayNameFor(widget.deviceId), overflow: TextOverflow.ellipsis),
+                Text(
+                  'History',
+                  style: Theme.of(context).textTheme.labelMedium
+                      ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                ),
+              ],
+            ),
             actions: [
               TextButton.icon(
                 key: const Key('history-export'),
@@ -288,19 +301,16 @@ class HistoryChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
-    final spots = [
-      for (final p in points)
-        if (p.values[sensor] != null)
-          FlSpot(p.time.millisecondsSinceEpoch.toDouble(), p.values[sensor]!),
-    ];
-    if (spots.isEmpty) {
+    final spots = chartSpots(points, sensor, maxGap: range.bucketDuration * 2.5);
+    final real = spots.where((s) => s != FlSpot.nullSpot).toList();
+    if (real.isEmpty) {
       return SizedBox(
         height: 220,
         child: Center(child: Text('No ${sensor.label.toLowerCase()} data in this period')),
       );
     }
 
-    final ys = spots.map((s) => s.y);
+    final ys = real.map((s) => s.y);
     var minY = ys.reduce(math.min);
     var maxY = ys.reduce(math.max);
     final pad = math.max((maxY - minY) * 0.15, 0.5);
@@ -336,7 +346,7 @@ class HistoryChart extends StatelessWidget {
     return SizedBox(
       height: 240,
       child: Semantics(
-        label: '${sensor.label} history chart, last ${range.label}, ${spots.length} points',
+        label: '${sensor.label} history chart, last ${range.label}, ${real.length} points',
         child: LineChart(
           duration: Duration.zero,
           LineChartData(
@@ -408,7 +418,14 @@ class HistoryChart extends StatelessWidget {
                 preventCurveOverShooting: true,
                 color: scheme.primary,
                 barWidth: 2.5,
-                dotData: FlDotData(show: spots.length < 3),
+                // A point with no neighbour on either side would be invisible as a line.
+                dotData: FlDotData(
+                  checkToShowDot: (spot, bar) {
+                    final i = bar.spots.indexOf(spot);
+                    bool gapAt(int j) => j < 0 || j >= bar.spots.length || bar.spots[j].isNull();
+                    return gapAt(i - 1) && gapAt(i + 1);
+                  },
+                ),
                 belowBarData: BarAreaData(
                   show: true,
                   color: scheme.primary.withValues(alpha: 0.10),
@@ -420,4 +437,22 @@ class HistoryChart extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Chart points for [sensor], with a break ([FlSpot.nullSpot]) wherever two neighbouring
+/// points are more than [maxGap] apart (for example while the API was not running), so the
+/// line doesn't suggest data that doesn't exist.
+List<FlSpot> chartSpots(List<HistoryPoint> points, SensorType sensor, {required Duration maxGap}) {
+  final out = <FlSpot>[];
+  DateTime? last;
+  for (final p in points) {
+    final v = p.values[sensor];
+    if (v == null) continue;
+    if (last != null && p.time.difference(last) > maxGap) {
+      out.add(FlSpot.nullSpot);
+    }
+    out.add(FlSpot(p.time.millisecondsSinceEpoch.toDouble(), v));
+    last = p.time;
+  }
+  return out;
 }

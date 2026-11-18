@@ -22,6 +22,13 @@ enum HistoryRange {
   /// Downsampling for CSV export (raw is limited to short ranges by the API).
   final String exportBucket;
 
+  Duration get bucketDuration => switch (bucket) {
+    '1m' => const Duration(minutes: 1),
+    '15m' => const Duration(minutes: 15),
+    '1h' => const Duration(hours: 1),
+    _ => const Duration(seconds: 1),
+  };
+
   String get bucketLabel => switch (bucket) {
     'raw' => 'every reading',
     '1m' => '1-minute averages',
