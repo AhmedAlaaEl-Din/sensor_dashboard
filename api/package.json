@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node src/server.js",
+    "seed": "node scripts/seed-history.js",
     "test": "vitest run"
   },
   "engines": {

@@ -40,6 +40,12 @@ CREATE TABLE IF NOT EXISTS users (
   role          TEXT NOT NULL CHECK (role IN ('admin', 'viewer'))
 );
 
+-- Small key/value notes, e.g. what the seed script wrote (see src/seed.js).
+CREATE TABLE IF NOT EXISTS meta (
+  key   TEXT PRIMARY KEY,
+  value TEXT
+);
+
 CREATE TABLE IF NOT EXISTS thresholds (
   sensor TEXT PRIMARY KEY,
   min    REAL,
