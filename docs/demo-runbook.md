@@ -100,9 +100,15 @@ Let it run for a few minutes first so the History charts have data. Sign in once
 out again, so the notification permission (Android 13+) is already granted.
 
 **Mosquitto caveat:** if another broker listens on `0.0.0.0:1883` (see needs-me P2-1), stopping
-*our* broker makes the app reconnect to that one, and the offline state won't show. Either stop
-that service for the recording, or simulate the outage over the cable instead:
-`adb reverse --remove tcp:1883`, wait about 8 s, then `adb reverse tcp:1883 tcp:1883`.
+*our* broker makes the app reconnect to that one, and the offline state won't show. Stop that
+service for the recording. (Removing `adb reverse tcp:1883` is **not** enough: an MQTT connection
+that is already open stays up.) The outage that worked on 2026-11-18: `.scriptsdev-down.ps1`
+(no `-Phone`), wait about 10 s, then `.scriptsdev-up.ps1 -Phone -NoRandomSpikes`.
+
+**Typing on the phone with adb:** on this Huawei keyboard, Enter in the email field does not move to
+the password field. Tap each field, and hide the keyboard (Back) before tapping the next one,
+because the form moves up while the keyboard is open. The scripted run used for the recording is
+described in progress-log.md (2026-11-18 evening).
 
 ## 2. Record (~75 s, calm pace)
 

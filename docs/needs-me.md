@@ -38,7 +38,14 @@ or change it. Why it matters:
 - When our broker is stopped, the app and the API silently connect to Mosquitto instead (same port).
   `scripts/dev-up.ps1` now warns about this.
 
-## P2-2. Phone shows "unauthorized", so steps 5–7 (install, recording, screenshots, cleanup) were skipped
+**Update 2026-11-18 19:46:** nothing was listening on 1883 any more, so Mosquitto has stopped
+(by you or on its own). If it is an automatic Windows service, it can come back after a reboot,
+so it is still worth checking the service's startup type.
+
+## ~~P2-2. Phone shows "unauthorized", so steps 5–7 (install, recording, screenshots, cleanup) were skipped~~ (DONE 2026-11-18 evening)
+Done after you accepted the prompt: installed, walked through, recorded `demo_videos/phase2-demo.mp4`,
+7 screenshots in `evidence/screenshots/p2-*.png`, cleaned up. See progress-log.md. Original note:
+
 `adb devices` listed `58K6R19924012174  unauthorized` at 07:38, 08:03 and 08:08. The phone is
 waiting for **"Allow USB debugging?"** to be accepted on its screen, which only you can do. Nothing
 was installed or recorded, and no phone settings were changed. **To do:** unlock the phone, accept
@@ -47,9 +54,12 @@ demo". The debug APK is built: `app/build/app/outputs/flutter-apk/app-debug.apk`
 Note: the phone still has the Phase 1 app with temperature max = 24. After installing Phase 2 and
 signing in, thresholds come from the server (defaults 5–35 °C), so that resets itself.
 
-## P2-3. Privacy scan: NOT SCANNED
-No Phase 2 video exists, and tesseract and ffmpeg are still not installed. Manual check once you
-record:
+## P2-3. Privacy scan: screenshots CHECKED BY EYE, video NOT SCANNED
+The 7 Phase 2 screenshots were reviewed by eye: status and nav bars cropped, only demo data and
+`@example.com`, the only notification is ours. The video (`demo_videos/phase2-demo.mp4`, 2:45,
+status bar cropped at record time) could not be frame-checked: no ffmpeg, tesseract or OpenCV.
+It was recorded with the status bar cropped and no other app opened, but a heads-up from another
+app could still have appeared during the 2:45. **Watch it once before publishing.** Full check:
 1. Install the tools: `winget install Gyan.FFmpeg` and `winget install UB-Mannheim.TesseractOCR`.
 2. Run the scan in `docs/demo-runbook.md` (Phase 1 §4 commands, Phase 2 §5 search terms).
 3. Watch every frame with a notification banner: it must be ours, never another app's.

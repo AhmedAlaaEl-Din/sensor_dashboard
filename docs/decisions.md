@@ -45,3 +45,6 @@
 | 36 | Developer hints (adb reverse, npm) removed from the UI. Labels: "Server address", "Live data address", "Sensor group". | Brief item: move developer-only text to the README and use friendly labels. A test asserts no "adb" or "npm" text on screen. |
 | 37 | `prefer_initializing_formals` lint disabled. | It flags private fields set from public named parameters, a deliberate pattern here. |
 | 38 | The e2e test skips (doesn't fail) when something answers on 1883 but sends no simulator data. | The unrelated Mosquitto on 0.0.0.0:1883 made it fail spuriously. |
+| 39 | History chart breaks the line where neighbouring points are more than 2.5 buckets apart (fl_chart null spot); a point with no neighbours is drawn as a dot. | On the phone, the 24 h chart drew a straight line across the 11 hours when the API was not running, which suggested data that doesn't exist. |
+| 40 | History app bar: device name with a small "History" line under it, instead of "<Device> history". | On the 360 dp phone the title was cut to "Greenhouse …" next to Export CSV. |
+| 41 | Demo outage for the recording: stop our own services with `dev-down` (no `-Phone`) and restart with `dev-up -Phone`. | Removing `adb reverse tcp:1883` doesn't drop an MQTT connection that is already open, so the app stayed "Live". |

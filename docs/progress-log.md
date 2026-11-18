@@ -1,5 +1,18 @@
 # Progress log
 
+## Phase 2 on-device session (2026-11-18, evening, phone authorized)
+
+**Status:** steps 5–7 are now **done**. Privacy: screenshots checked by eye, video **not frame-scanned** (no tools; see needs-me P2-3). Branch still **not pushed or merged**.
+
+- 19:46: `adb devices` shows the phone as `device`. Port 1883 was free: **Mosquitto is no longer listening** (needs-me P2-1 updated). Started `dev-up.ps1 -Phone -NoRandomSpikes`: broker 127.0.0.1:1883, API 127.0.0.1:3000, `adb reverse` for both. Installed the Phase 2 debug APK. Huawei DUB-LX1, Android 8.1, so no runtime notification permission is needed.
+- 19:51: Login screen OK. Wrong password → "Wrong email or password." (real API round trip over USB). `viewer-demo-pass` → dashboard, live.
+- 19:52: Greenhouse → History: 1 h (333 readings, 1-minute averages) and 24 h work. Export CSV → "CSV ready", 9 rows → Done (share sheet deliberately not opened). Profile shows Viewer with the auto sign-out time. Settings: thresholds greyed out for the viewer.
+- 19:54: Signed out, signed in as admin (the first try failed because of my adb typing, not the app; see the runbook note). Temperature max 35 → 24 → Save → **heads-up notification** "Greenhouse: temperature alert" plus the in-app banner.
+- 19:56: Outage: removing `adb reverse tcp:1883` did **not** drop the open MQTT connection. Stopping our services with `dev-down` showed "Reconnecting…", greyed values and "No connection". After `dev-up`, it went back to "Live" by itself.
+- **Two UI issues found on the device and fixed** (decisions 39–40): (1) the 24 h chart drew a straight line across the 11 hours when the API was off, so it now breaks the line at gaps; (2) the History title was cut off ("Greenhouse …"), so it is now the device name with "History" underneath. Added 3 unit tests. `flutter analyze` is clean, `flutter test` **85/85 passed** (the e2e test ran this time because our broker was on 1883). Rebuilt and reinstalled; checked on the phone at 20:02. After the reinstall, the session was restored from secure storage and the threshold of 24 came back from the server.
+- 20:03–20:06: Recorded `demo_videos/phase2-demo.mp4` (scrcpy 5.0.1, 2:45, 720×1384, status bar cropped, no audio, touches shown), driven by an adb script. Steps: viewer wrong/right password → Greenhouse history 24 h → export → profile → sign out → admin → threshold 24 → heads-up → outage → Live.
+- 20:06: Clean-up: thresholds put back to defaults as admin (Settings → Defaults → Save). Screenshots `evidence/screenshots/p2-01…p2-07` cropped (status and nav bars) and reviewed by eye. `dev-down -Phone`: services stopped, port forwards removed, stay-awake off. The app is left signed in as admin on the phone.
+
 ## Phase 2 summary (2026-11-18, end of unattended run, branch `phase2-history-auth`)
 
 **Done**
