@@ -1,5 +1,32 @@
 # Progress log
 
+## Phase 2 summary (2026-11-18, end of unattended run, branch `phase2-history-auth`)
+
+**Done**
+- **API** (`api/`, Node + Express 5 on **127.0.0.1:3000**): stores every MQTT reading in SQLite (`data/history.db`, git-ignored, indexed by device+time), 7-day retention job, `POST /auth/login` (bcrypt, 30-min HS256 JWT), `GET /devices`, history with raw/1m/15m/1h buckets, CSV export, shared thresholds (PUT admin-only), `DELETE` history (admin-only), login rate limit, zod validation, helmet headers, JSON-only errors. The JWT secret is generated into `api/.env` (git-ignored, never read or printed). Demo users: `admin@example.com`, `viewer@example.com`.
+- **App:** login screen, Profile with role, secure token storage, auto sign-out on expiry/resume/401, History (1 h/24 h/7 d, chart, min/avg/max, pull to refresh, loading/empty/error), Export CSV → "CSV ready" → share sheet, heads-up alert notifications (tap opens the device), role-aware thresholds synced with the server, developer hints moved to the README.
+- **Scripts:** `scripts/dev-up.ps1` and `scripts/dev-down.ps1` (tested: start, refused double start, stop only our PIDs; `-Phone` for adb reverse).
+- **Tests:** API Vitest **25/25**; Flutter `analyze` clean, `test` **81 passed, 1 skipped** (e2e skips because the broker on 1883 isn't ours, see risks); broker smoke **3/3**. The debug APK builds.
+- **Docs:** README (features, mermaid diagram simulator → broker → API + SQLite → app, API table, run steps, demo accounts, security notes, push-notification limitation, placeholders), `docs/phase2-explained.md`, Phase 2 runbook, decisions 21–38.
+- **Secrets scan** (110 tracked files): **clean.** No .env, keys, AIza, private_key, JWTs or real emails. The only hits are the code that *generates* the secret and a test using `Viewer@Example.com`.
+
+**Blocked**
+- **On-device steps 5–7** (install, recording, screenshots, cleanup): the phone shows **"unauthorized"** in `adb devices` (3 checks). It needs "Allow USB debugging?" accepted on the phone.
+- **Privacy scan (step 8): NOT SCANNED.** No video; tesseract and ffmpeg missing.
+
+**Needs me:** docs/needs-me.md P2-1 (an unrelated **Mosquitto listening on 0.0.0.0:1883**, reachable from your network), P2-2 (accept the USB debugging prompt, then record with the runbook), P2-3 (privacy check after recording), P2-4 (review and merge).
+
+**Videos / screenshots:** none for Phase 2. Phase 1 assets are unchanged in `demo_videos/` and `evidence/screenshots/` (git-ignored).
+
+**Risks**
+- The Phase 2 app has **not run on a real phone yet**. Phase 1 found a real-device-only bug (the client-id length), so expect possible device issues: notification permission, secure storage on Huawei EMUI, share sheet.
+- **The Mosquitto on 0.0.0.0:1883** is outside this project: it is exposed to your network, and if our broker stops, the app and API silently connect to it.
+- **compileSdk 37** and brand-new plugin versions (flutter_local_notifications 23) on a very new toolchain.
+- **Background alerts** depend on Android keeping the app alive (documented; no FCM by design).
+- **The broker has no auth or TLS**, and the API is HTTP. That is safe only because everything binds to loopback.
+
+---
+
 ## Summary (2026-11-17, end of unattended run)
 
 **Done**
@@ -66,6 +93,7 @@
 ## Log
 - 2026-11-18 07:38: Created branch `phase2-history-auth` from `main`. `adb devices` shows the phone as **unauthorized**: the USB-debugging prompt on the phone has not been accepted. I'll re-check later. tesseract and ffmpeg are still missing.
 - 2026-11-18 07:45: Finished the API (`api/`): MQTT ingest into SQLite (`data/history.db`, indexed by device+time), login/JWT, devices, history with buckets, CSV export, thresholds, admin-only delete, retention job, helmet, rate limit, zod validation, JSON-only errors. Vitest: **25/25 passed**. A live check against the real broker worked: wrong password gives 401, viewer login works, 3 devices listed, history and CSV OK. The API listens on 127.0.0.1:3000 only. `api/.env` was generated (not read) and is git-ignored. **Found** an unrelated Mosquitto on 0.0.0.0:1883 (needs-me P2-1).
-- 2026-11-18 08:00: Added `scripts/dev-up.ps1` (starts broker, simulator and API; waits for 127.0.0.1 listeners; warns about other listeners on 1883/3000; `-Phone` adds adb reverse 1883+3000; `-NoRandomSpikes`) and `scripts/dev-down.ps1` (stops only the PIDs it started; `-Phone` removes adb reverse and turns stay-awake off). Tested: start, a refused second start, stop. They run under the existing RemoteSigned policy; an `-ExecutionPolicy Bypass` invocation was blocked by the permission system, and the docs don't use it.
-- 2026-11-18 09:05: Finished the Flutter Phase 2 work: login screen (server settings link), Profile (role, session end, sign out), secure token storage, auto sign-out, History screen (1 h/24 h/7 d, chart, min/avg/max, pull to refresh, loading/empty/error), CSV export with the share sheet, local alert notifications (tap opens the device), server-synced role-aware thresholds, developer hints moved out of the UI. `flutter analyze` clean; `flutter test` **81 passed, 1 skipped** (e2e). The debug APK builds after compileSdk 37 and desugaring.
-- 2026-11-18 09:25: Docs: rewrote README.md (features, mermaid diagram simulator → broker → API + SQLite → app, API table, run steps with dev-up/dev-down, demo accounts, security notes protected vs demo-only, push-notification limitation, placeholders). Added docs/phase2-explained.md and a Phase 2 section in docs/demo-runbook.md.
+- 2026-11-18 07:52: Added `scripts/dev-up.ps1` (starts broker, simulator and API; waits for 127.0.0.1 listeners; warns about other listeners on 1883/3000; `-Phone` adds adb reverse 1883+3000; `-NoRandomSpikes`) and `scripts/dev-down.ps1` (stops only the PIDs it started; `-Phone` removes adb reverse and turns stay-awake off). Tested: start, a refused second start, stop. They run under the existing RemoteSigned policy; an `-ExecutionPolicy Bypass` invocation was blocked by the permission system, and the docs don't use it.
+- 2026-11-18 08:03: Finished the Flutter Phase 2 work: login screen (server settings link), Profile (role, session end, sign out), secure token storage, auto sign-out, History screen (1 h/24 h/7 d, chart, min/avg/max, pull to refresh, loading/empty/error), CSV export with the share sheet, local alert notifications (tap opens the device), server-synced role-aware thresholds, developer hints moved out of the UI. `flutter analyze` clean; `flutter test` **81 passed, 1 skipped** (e2e). The debug APK builds after compileSdk 37 and desugaring.
+- 2026-11-18 08:06: Docs: rewrote README.md (features, mermaid diagram simulator → broker → API + SQLite → app, API table, run steps with dev-up/dev-down, demo accounts, security notes protected vs demo-only, push-notification limitation, placeholders). Added docs/phase2-explained.md and a Phase 2 section in docs/demo-runbook.md.
+- 2026-11-18 08:08: Secrets scan of 110 tracked files: clean (details in the summary). Final runs: API 25/25, broker 3/3, Flutter analyze clean, 81 passed + 1 skipped. The phone is still unauthorized (3rd check). Nothing of ours is left listening (only the unrelated Mosquitto on 0.0.0.0:1883).

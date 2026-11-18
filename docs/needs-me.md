@@ -37,3 +37,23 @@ or change it. Why it matters:
   (`listener 1883 127.0.0.1` in mosquitto.conf), or stop the Windows service ("Mosquitto Broker").
 - When our broker is stopped, the app and the API silently connect to Mosquitto instead (same port).
   `scripts/dev-up.ps1` now warns about this.
+
+## P2-2. Phone shows "unauthorized", so steps 5–7 (install, recording, screenshots, cleanup) were skipped
+`adb devices` listed `58K6R19924012174  unauthorized` at 07:38, 08:03 and 08:08. The phone is
+waiting for **"Allow USB debugging?"** to be accepted on its screen, which only you can do. Nothing
+was installed or recorded, and no phone settings were changed. **To do:** unlock the phone, accept
+the prompt (tick "Always allow from this computer"), then follow `docs/demo-runbook.md` → "Phase 2
+demo". The debug APK is built: `app/build/app/outputs/flutter-apk/app-debug.apk`.
+Note: the phone still has the Phase 1 app with temperature max = 24. After installing Phase 2 and
+signing in, thresholds come from the server (defaults 5–35 °C), so that resets itself.
+
+## P2-3. Privacy scan: NOT SCANNED
+No Phase 2 video exists, and tesseract and ffmpeg are still not installed. Manual check once you
+record:
+1. Install the tools: `winget install Gyan.FFmpeg` and `winget install UB-Mannheim.TesseractOCR`.
+2. Run the scan in `docs/demo-runbook.md` (Phase 1 §4 commands, Phase 2 §5 search terms).
+3. Watch every frame with a notification banner: it must be ours, never another app's.
+4. Check that the status bar is cropped off in the video and screenshots.
+
+## P2-4. Review and merge
+All Phase 2 work is on the local branch `phase2-history-auth` (not pushed, not merged), as instructed.
