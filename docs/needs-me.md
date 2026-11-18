@@ -56,10 +56,11 @@ signing in, thresholds come from the server (defaults 5–35 °C), so that reset
 
 ## P2-3. Privacy scan: screenshots CHECKED BY EYE, video NOT SCANNED
 The 7 Phase 2 screenshots were reviewed by eye: status and nav bars cropped, only demo data and
-`@example.com`, the only notification is ours. The video (`demo_videos/phase2-demo.mp4`, 2:45,
-status bar cropped at record time) could not be frame-checked: no ffmpeg, tesseract or OpenCV.
-It was recorded with the status bar cropped and no other app opened, but a heads-up from another
-app could still have appeared during the 2:45. **Watch it once before publishing.** Full check:
+`@example.com`, the only notification is ours. The video (`demo_videos/phase2-demo.mp4`, re-recorded
+2026-11-18 20:47, 1:43, status bar cropped at record time) could not be frame-checked: no ffmpeg,
+tesseract or OpenCV. Snapshots taken during the run (7 d chart, heads-up, offline, reconnect) show
+only demo data and our own notification, but a heads-up from another app could still have
+appeared in between. **Watch it once before publishing.** Full check:
 1. Install the tools: `winget install Gyan.FFmpeg` and `winget install UB-Mannheim.TesseractOCR`.
 2. Run the scan in `docs/demo-runbook.md` (Phase 1 §4 commands, Phase 2 §5 search terms).
 3. Watch every frame with a notification banner: it must be ours, never another app's.

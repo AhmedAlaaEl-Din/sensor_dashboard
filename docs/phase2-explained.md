@@ -64,6 +64,12 @@ same answer, so nobody can find out which emails exist.
 The server keeps **7 days** and deletes older rows every hour (**retention**), so the database
 doesn't grow forever.
 
+**For demos, there is a "seed".** A brand-new database has no history, so the week chart would be
+empty. `npm run seed` (in `api/`) makes up 7 days of believable readings: warmer in the afternoon,
+cooler at night, a slow pressure "weather" wave, a little noise, and a few short spikes. To protect
+real recordings, it refuses to run if the database holds readings the API recorded, unless you add
+`--force`.
+
 ## What bucketing is
 
 A week of readings is about 600,000 points per device. A phone screen is about 400 pixels wide, so
@@ -106,11 +112,11 @@ rather than faked.
 
 ## How I know it works
 
-- **API tests (Vitest + supertest, 25 tests):** sign-in required, wrong password, expired
+- **API tests (Vitest + supertest, 33 tests):** sign-in required, wrong password, expired
   token, forged token and `alg: none` rejected, rate limit, viewer vs admin permissions,
   bucketing sizes and averages, CSV format and filename, retention, input validation, security
   headers, no stack traces.
-- **App tests (81 + 1 skipped):** history parsing (including bad data), the sign-in flow (success,
+- **App tests (86):** history parsing (including bad data), the sign-in flow (success,
   wrong password, server down, restore, expiry, a 401 from the server), CSV export (request,
   filename, file content, row count), widget tests for login, profile/sign-out, history
   (load, range switch, export, error, empty) and role-aware settings.

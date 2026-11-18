@@ -1,5 +1,19 @@
 # Progress log
 
+## Phase 2 follow-up: seed, re-recorded demo, MQTT reconnect fix (2026-11-18, 20:30–21:00)
+
+**Status:** done. Branch `phase2-history-auth`, **not pushed or merged**. API **33/33**, Flutter `analyze` clean, **86/86** tests.
+
+- 20:37: **Seed script** `api/scripts/seed-history.js` (`npm run seed`, logic in `api/src/seed.js`): 7 days × 1 reading/min × 3 devices = 30,240 rows; daily cycle, drift, noise, 5 short spikes; ends at the live simulator's values. It refuses when the DB has readings the API recorded (`meta.seed_until` marker) unless `--force`, and touches neither users nor thresholds. 8 new Vitest tests. Checked against the real DB: it refused (3,594 recorded readings, exit 1).
+- 20:38: **dev-up `-Seed` / `-Force`**: runs the seed before the API starts. Tested both: without `-Force` it warned and started anyway; with `-Force` it seeded 30,240 rows. README: new "Simulated history (seed)" section, dev-up options, limitation text.
+- 20:39: On the phone, 24 h showed a clean day/night curve and 7 d showed seven days. The last hour looked like a staircase (the easing removed the noise), so I added per-reading noise after the easing and reseeded.
+- 20:41: Take 1 of the re-recording was cut off at its 100 s limit during the outage. The run took 116 s because of adb round trips. The move of the old video to `-take1` failed (file locked by another program), so it was overwritten. That was the 2:45 take, which this request replaces anyway.
+- 20:44: Take 2: every step batched into one `adb shell` call (98 s). Complete, but it ran 118 s with a ~17 s idle tail.
+- 20:47: **Take 3 = final** `demo_videos/phase2-demo.mp4` (1:43, 720×1384, status bar cropped, no audio). Order: wrong password → viewer login → live dashboard → Greenhouse History 1 h → 24 h → 7 d → Export CSV → Done → Profile → sign out → admin login → temperature max 24 → heads-up + red banner → broker stopped ("Reconnecting…", "No connection") → broker restarted → "Live". Snapshots during the run confirmed each state. Only the broker was stopped (by its PID), so history kept working. Takes 1 and 2 were deleted.
+- 20:50: **Bug found in logcat during the outage:** `Unhandled Exception: SocketException: Connection reset by peer`, once per reconnect attempt. Cause: with the broker down, `adb reverse` accepts and then resets the connection. mqtt_client wrote CONNECT to the dead socket (the error came from its listener, not the `connect()` future) and waited 3 attempts × 4 s. Fix (decision 45): one attempt per connect, plus a `runZonedGuarded` that turns those errors into a failed attempt or a lost connection. Regression test with a local server that accepts and drops (it failed before the fix: hung for over 8 s). Rebuilt, reinstalled, and repeated the outage on the phone at 20:54: logcat shows handled "MQTT connect failed" lines only, and it reconnected by itself. (The video was recorded with the build before this fix; it looks the same.)
+- 20:56: **Clean-up.** The first Defaults → Save did **not** reach the server (still max 24): the heads-up notification covered the app bar, so my tap opened Greenhouse instead of Settings. I redid it step by step; checked with `GET /thresholds` that temperature is 5–35 again. Signed out. `dev-down -Phone`, `svc power stayon false`, `adb reverse --remove-all` (list empty), ports 1883 and 3000 free. Reseed without `--force` refused (2,922 recorded readings), so I ran `npm run seed -- --force`: the DB now holds exactly 10,080 seeded readings per device, ending 20:56, with default thresholds.
+- Also fixed: runbook lines where an earlier scripted edit had dropped the backslashes (`.scriptsdev-down.ps1`).
+
 ## Phase 2 on-device session (2026-11-18, evening, phone authorized)
 
 **Status:** steps 5–7 are now **done**. Privacy: screenshots checked by eye, video **not frame-scanned** (no tools; see needs-me P2-3). Branch still **not pushed or merged**.
