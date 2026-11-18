@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:mqtt_client/mqtt_client.dart';
@@ -50,7 +51,9 @@ class MqttClientGateway implements MqttGateway {
     _teardownClient();
     _intentionalDisconnect = false;
 
-    final client = MqttServerClient.withPort(host, clientId, port)
+    // One attempt per connect(): ConnectionController owns retries and backoff. (The default of 3
+    // attempts waits connectTimeoutPeriod each time, so a dropped connection took 12 s to fail.)
+    final client = MqttServerClient.withPort(host, clientId, port, maxConnectionAttempts: 1)
       ..logging(on: false)
       ..keepAlivePeriod = 10
       ..connectTimeoutPeriod = 4000
@@ -59,12 +62,43 @@ class MqttClientGateway implements MqttGateway {
       ..setProtocolV311() // MQTT 3.1.1: longer client ids, wider broker support.
       ..connectionMessage = MqttConnectMessage().withClientIdentifier(clientId).startClean();
 
+    final attempt = Completer<MqttClientConnectionStatus?>();
+    void failAttempt(Object e, [StackTrace? s]) {
+      if (!attempt.isCompleted) attempt.completeError(e, s);
+    }
+
     client.onDisconnected = () {
+      // Dropped before the broker accepted us: this attempt failed (not a "lost" connection).
+      if (!attempt.isCompleted) return failAttempt(const SocketException('Connection closed'));
       if (!_intentionalDisconnect && !_lost.isClosed) _lost.add(null);
     };
     _client = client;
 
-    final status = await client.connect();
+    // mqtt_client raises some socket errors from its own listeners instead of through the
+    // connect() future. Through `adb reverse` with the broker down, the TCP connection is
+    // accepted and then reset: that surfaced as an unhandled SocketException and connect()
+    // hung. Catch those in a zone and turn them into a normal failed attempt.
+    runZonedGuarded(
+      () => client.connect().then((s) {
+        if (!attempt.isCompleted) attempt.complete(s);
+      }, onError: failAttempt),
+      (e, s) {
+        if (!attempt.isCompleted) return failAttempt(e, s);
+        debugPrint('MQTT socket error after connect: $e');
+        if (identical(_client, client) && !_intentionalDisconnect && !_lost.isClosed) {
+          _teardownClient();
+          _lost.add(null);
+        }
+      },
+    );
+
+    final MqttClientConnectionStatus? status;
+    try {
+      status = await attempt.future;
+    } catch (_) {
+      if (identical(_client, client)) _teardownClient();
+      rethrow;
+    }
     if (status?.state != MqttConnectionState.connected) {
       _teardownClient();
       throw MqttRefusedException(status?.returnCode?.name ?? 'unknown');
