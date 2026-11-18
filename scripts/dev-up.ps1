@@ -6,6 +6,14 @@
 .PARAMETER Phone
   Also forward the phone's ports 1883 and 3000 to this computer over USB (adb reverse).
 
+.PARAMETER Seed
+  Before starting the API, fill data/history.db with 7 days of simulated history (1 reading per
+  minute, 3 devices) so the History charts are full. Refuses if the DB holds readings the API
+  recorded; add -Force to replace them. Same as: cd api; npm run seed [-- --force]
+
+.PARAMETER Force
+  With -Seed: replace existing recorded readings.
+
 .PARAMETER NoRandomSpikes
   Calm, predictable data (good for recordings). Spikes can still be triggered with
   `npm run spike -- <device>` in broker/.
@@ -15,7 +23,9 @@
 #>
 param(
   [switch]$Phone,
-  [switch]$NoRandomSpikes
+  [switch]$NoRandomSpikes,
+  [switch]$Seed,
+  [switch]$Force
 )
 
 $ErrorActionPreference = 'Stop'
@@ -63,6 +73,19 @@ foreach ($dir in 'broker', 'api') {
 }
 
 $node = (Get-Command node).Source
+
+# Optional simulated history (runs before the API starts, so nothing else writes to the DB).
+if ($Seed) {
+  $seedArgs = @('scripts/seed-history.js')
+  if ($Force) { $seedArgs += '--force' }
+  Push-Location (Join-Path $root 'api')
+  & $node @seedArgs
+  $seedExit = $LASTEXITCODE
+  Pop-Location
+  if ($seedExit -ne 0) {
+    Write-Host 'Seeding skipped (see above). Starting with the existing history.' -ForegroundColor Yellow
+  }
+}
 $simArgs = @('src/dev.js')
 if ($NoRandomSpikes) { $simArgs += '--no-random-spikes' }
 

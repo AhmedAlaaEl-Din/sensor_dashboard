@@ -108,6 +108,8 @@ Requirements: Flutter SDK (stable), Android SDK platform-tools (`adb`), Node.js 
 # 1. Start the broker, simulator and API (installs npm packages the first time)
 .\scripts\dev-up.ps1 -Phone            # -Phone also runs adb reverse for ports 1883 and 3000
 #    options: -NoRandomSpikes for calm data
+#             -Seed           fill the history with 7 days of simulated data first
+#             -Seed -Force    ...even if the database already has recorded readings
 
 # 2. Install and run the app
 cd app
@@ -131,6 +133,28 @@ once with `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`.
 `adb reverse tcp:1883 tcp:1883` and `adb reverse tcp:3000 tcp:3000` are active. `dev-up -Phone`
 does this for you. If the app says it can't reach the server, check `adb reverse --list`.
 
+### Simulated history (seed)
+
+A fresh install has no history, so the 24 h and 7 d charts start empty. The seed script fills
+`data/history.db` with **7 days of simulated readings, 1 per minute, for the 3 devices**
+(30,240 rows): smooth day/night cycles, slow pressure "weather", small noise, and a few short
+spikes that cross the default thresholds. The last 3 hours ease into the live simulator's values,
+so seeded and live data join up without a jump.
+
+```powershell
+cd api
+npm run seed                        # refuses if the database has readings the API recorded
+npm run seed -- --force             # replace them anyway
+npm run seed -- --days 3 --seed 7   # other length / different random pattern
+```
+
+Or start everything with `.\scripts\dev-up.ps1 -Seed` (add `-Force` to replace recorded data).
+dev-up runs the seed **before** the API starts, so nothing else is writing to the database.
+
+**Safety:** the seed replaces only the `readings` table; users and thresholds are not touched. It
+remembers where its own data ends (`meta.seed_until`), so re-seeding over seeded data is allowed,
+but anything the API recorded after that counts as real data and needs `--force`.
+
 ### Demo accounts (local demo only)
 
 | Email | Password | Role |
@@ -146,7 +170,7 @@ delete `data/history.db` to re-seed.
 
 ```powershell
 cd app;    flutter analyze; flutter test     # unit + widget tests
-cd api;    npm test                          # Vitest + supertest
+cd api;    npm test                          # Vitest + supertest (includes the seed)
 cd broker; npm test                          # broker + simulator smoke test
 ```
 
@@ -192,8 +216,9 @@ guaranteed and was left out on purpose.
 ## Limitations
 
 - **Simulated data only.** No real sensors or device provisioning.
-- **History** is kept for 7 days (`RETENTION_DAYS`), then cleaned up hourly. History exists only for
-  time when the API was running.
+- **History** is kept for 7 days (`RETENTION_DAYS`), then cleaned up hourly. Recorded history exists only
+  for time when the API was running; gaps show as breaks in the chart. Use the
+  [seed](#simulated-history-seed) for full demo charts.
 - **Android only.** iOS, web and desktop are not configured.
 - **If port 1883 is already used** by another broker on all interfaces (for example a Mosquitto
   service), our broker still binds 127.0.0.1 and wins locally, but the other one stays reachable
