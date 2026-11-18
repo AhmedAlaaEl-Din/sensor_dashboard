@@ -7,7 +7,7 @@ Phase 1 runs entirely on your own machine. A small local broker and a simulator 
 real hardware, so it can be demonstrated anywhere with nothing but a laptop and a USB phone.
 **All data shown is simulated.** No cloud, no accounts, no real credentials.
 
-> **Demo video:** _[link to be added]_
+> **Demo video:** [Watch the demo on YouTube](https://youtube.com/shorts/mwZjokxNZyg) (unlisted, 1:07, simulated data)
 
 | Dashboard | Device detail | Alert | Settings | Offline |
 |-----------|---------------|-------|----------|---------|
