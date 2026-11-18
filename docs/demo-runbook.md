@@ -77,3 +77,69 @@ adb shell svc power stayon false
 adb reverse --remove-all
 # Ctrl+C the `npm run dev` terminal
 ```
+
+---
+
+# Phase 2 demo (login, history, export, notifications)
+
+Simulated data only. **Do not open the notification shade, system settings or any account on the
+phone.** Turn on Do Not Disturb by hand first, but **allow this app's notifications**, so only our
+heads-up banner can appear. Accept the "Allow USB debugging?" prompt on the phone once
+(`adb devices` must say `device`, not `unauthorized`).
+
+## 1. Prepare
+
+```powershell
+adb devices                                     # must list the phone as "device"
+.\scripts\dev-up.ps1 -Phone -NoRandomSpikes     # broker + simulator + API, adb reverse 1883 and 3000
+adb shell svc power stayon usb
+cd app; flutter build apk --debug; adb install -r build\app\outputs\flutter-apk\app-debug.apk
+```
+
+Let it run for a few minutes first so the History charts have data. Sign in once as admin and sign
+out again, so the notification permission (Android 13+) is already granted.
+
+**Mosquitto caveat:** if another broker listens on `0.0.0.0:1883` (see needs-me P2-1), stopping
+*our* broker makes the app reconnect to that one, and the offline state won't show. Either stop
+that service for the recording, or simulate the outage over the cable instead:
+`adb reverse --remove tcp:1883`, wait about 8 s, then `adb reverse tcp:1883 tcp:1883`.
+
+## 2. Record (~75 s, calm pace)
+
+```powershell
+scrcpy --no-audio --show-touches --max-size=1280 --crop=720:1384:0:56 --record=demo_videos\phase2-demo.mp4
+```
+(Adjust `--crop` to your screen: width:height:x:y, where y is the status-bar height.)
+
+| Time | Action |
+|------|--------|
+| 0–8 s | Login screen: `viewer@example.com` with a **wrong** password → "Wrong email or password." |
+| 8–14 s | Correct password `viewer-demo-pass` → dashboard, live gauges. |
+| 14–24 s | Open Greenhouse → **History** → 1 h, then **24 h**. |
+| 24–32 s | **Export CSV** → "CSV ready" dialog → **Done** (don't open the share sheet: it can show real contacts). |
+| 32–38 s | Back → Profile (role: Viewer) → **Sign out**. |
+| 38–46 s | Sign in as `admin@example.com` / `admin-demo-pass` → Profile shows Admin → back. |
+| 46–58 s | Settings → Temperature max → a value **below** the current greenhouse temperature (e.g. 24) → Save, while connected. Wait for the **heads-up banner** (don't pull down the shade). |
+| 58–72 s | Stop the broker (or remove the 1883 reverse, see the caveat): "Offline · retrying". Restore it: "Live" again. |
+
+## 3. Screenshots (status bar cropped later)
+
+```powershell
+adb exec-out screencap -p > evidence\screenshots\p2-01-login-error.png
+# ...repeat for p2-02-dashboard, p2-03-history-24h, p2-04-export, p2-05-profile, p2-06-notification, p2-07-offline
+```
+Crop the status bar (top ~56 px) and nav bar before sharing.
+
+## 4. Clean up
+
+```powershell
+# In the app as admin: Settings → Defaults → Save (puts thresholds back on the server)
+adb shell svc power stayon false
+.\scripts\dev-down.ps1 -Phone        # stops our processes, adb reverse --remove-all
+```
+
+## 5. Privacy scan
+
+Same as Phase 1 §4 (needs ffmpeg + tesseract), with these search terms:
+`gmail|hotmail|yahoo|valeo|wi-?fi|ssid|@` (expect only `@example.com`). Also review every frame
+with a notification banner by eye: it must be ours ("Greenhouse: temperature alert").
