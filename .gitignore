@@ -19,3 +19,12 @@ Thumbs.db
 
 # Claude local settings
 .claude/settings.local.json
+
+# Phase 2: local data, logs and dev process state (never committed)
+data/
+logs/
+.dev-pids.json
+*.db
+*.db-journal
+*.db-wal
+*.db-shm

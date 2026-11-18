@@ -23,3 +23,17 @@ puts it back to 35.
 
 ## 5. Review and merge
 All work is on the local branch `phase1-foundation` (not pushed, not merged), as instructed.
+
+---
+
+# Phase 2
+
+## P2-1. A separate Mosquitto broker is listening on ALL network interfaces (0.0.0.0:1883)
+Found on 2026-11-18 07:45: `mosquitto.exe` (PID 19728 at that time) listens on `0.0.0.0:1883` and
+`[::]:1883`. It is **not part of this project** and was not running during Phase 1. I did not stop
+or change it. Why it matters:
+- It is reachable from your network (Wi-Fi/LAN) on port 1883, which goes against this project's
+  local-only rule. If you didn't start it on purpose, stop it or bind it to 127.0.0.1
+  (`listener 1883 127.0.0.1` in mosquitto.conf), or stop the Windows service ("Mosquitto Broker").
+- When our broker is stopped, the app and the API silently connect to Mosquitto instead (same port).
+  `scripts/dev-up.ps1` now warns about this.

@@ -22,3 +22,16 @@
 | 18 | INTERNET permission is added to the main manifest; the label is "Sensor Dashboard". | Flutter only adds it to debug/profile manifests; release builds would otherwise fail to connect. |
 | 19 | Raw exceptions go to `debugPrint` only; the UI shows mapped, friendly messages. | Brief: no raw exceptions on screen. |
 | 20 | `kotlin.incremental=false` in app/android/gradle.properties. | The first APK build failed: Kotlin incremental caches can't span drives (project on E:, pub cache on C:). Costs a little build speed only. |
+
+## Phase 2
+
+| # | Decision | Reason |
+|---|----------|--------|
+| 21 | API in Node with Express 5, using the built-in `node:sqlite` (no native module) and `bcryptjs` (pure JS). | Node 26 on Windows: avoids native builds (better-sqlite3, argon2), which often lack prebuilt binaries for brand-new Node versions. |
+| 22 | JWT HS256, 30 min lifetime, secret generated into `api/.env` on first start (48 random bytes), never logged. | "Short-lived JWT" plus the secret-handling rule. The verifier pins `algorithms: ['HS256']` (blocks `alg: none` and confusion attacks). |
+| 23 | Demo users `admin@example.com` / `admin-demo-pass` and `viewer@example.com` / `viewer-demo-pass`, documented in the README; they can be overridden with the env vars `DEMO_ADMIN_PASSWORD` / `DEMO_VIEWER_PASSWORD`. | They must be typed into the app for the demo; generating them into `.env` would force reading `.env`. They protect nothing real and exist only on 127.0.0.1. |
+| 24 | Login limiter: 5 failed attempts per 5 min per IP+email (successful logins don't count). Same message and similar timing for an unknown email and a wrong password (dummy bcrypt compare). | Slows brute force without locking the whole phone (all adb-reverse traffic comes from 127.0.0.1), and avoids revealing which emails exist. |
+| 25 | Thresholds live server-side (`GET/PUT /thresholds`, PUT admin-only); history delete is `DELETE /devices/:id/history` (admin-only). | "Viewer cannot change thresholds or delete history" has to be enforced by the server, not only hidden in the UI. |
+| 26 | Buckets raw / 1m / 15m / 1h as averages; stats (min/avg/max) always from raw readings; raw limited to ranges ≤ 6 h; max range 31 days. | Keeps responses small for the chart while keeping stats exact. |
+| 27 | CSV: ISO-8601 UTC timestamps, numbers rounded to 2 decimals, empty cell for a missing value, streamed in chunks. | Easy to open in Excel and Sheets; device ids are validated (`[A-Za-z0-9_-]`), so no CSV or formula injection. |
+| 28 | Retention: delete readings older than `RETENTION_DAYS` (default 7) at start and every hour. | Matches the brief; the DB stays bounded (~1.8 M rows for 3 devices). |

@@ -58,3 +58,11 @@
 - Leftover on the phone: the app is installed with temperature max = 24 saved from the demo. Settings → Defaults → Save resets it.
 - 2026-11-18: Added GitHub remote `origin` (https://github.com/AhmedAlaaEl-Din/sensor_dashboard.git; remote is empty, nothing pushed). Uploaded `demo_videos/sensor_dashboard_demo_final.mp4` (owner's final cut, 1:07) to the owner's YouTube channel at the owner's request: unlisted, not made for kids, description 'This video shows a demo for sensor dashboard'. Link: https://youtube.com/shorts/mwZjokxNZyg. Added to README.
 - 2026-11-18: Owner asked to push. There was only one branch, so it was renamed `phase1-foundation` → `main` and pushed with `git push -u origin main`. The secrets re-scan before the push was clean. No PR/merge was needed. CLAUDE.md git rule updated.
+
+---
+
+# Phase 2: login, history, export and alerts
+
+## Log
+- 2026-11-18 07:38: Created branch `phase2-history-auth` from `main`. `adb devices` shows the phone as **unauthorized**: the USB-debugging prompt on the phone has not been accepted. I'll re-check later. tesseract and ffmpeg are still missing.
+- 2026-11-18 07:45: Finished the API (`api/`): MQTT ingest into SQLite (`data/history.db`, indexed by device+time), login/JWT, devices, history with buckets, CSV export, thresholds, admin-only delete, retention job, helmet, rate limit, zod validation, JSON-only errors. Vitest: **25/25 passed**. A live check against the real broker worked: wrong password gives 401, viewer login works, 3 devices listed, history and CSV OK. The API listens on 127.0.0.1:3000 only. `api/.env` was generated (not read) and is git-ignored. **Found** an unrelated Mosquitto on 0.0.0.0:1883 (needs-me P2-1).
