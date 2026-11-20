@@ -46,7 +46,7 @@ void main() {
       async.flushMicrotasks();
 
       expect(c.status, ConnectionStatus.offline);
-      expect(c.errorMessage, contains("Can't reach the broker at 127.0.0.1:1883"));
+      expect(c.errorMessage, contains("Can't reach the live data server at 127.0.0.1:1883"));
       expect(c.errorMessage, isNot(contains('OS Error')));
       expect(c.errorMessage, isNot(contains('Exception')));
       expect(gw.connectCalls, 1);

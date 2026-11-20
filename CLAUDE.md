@@ -18,7 +18,7 @@ Flutter Android app showing live **simulated** sensor data from a local MQTT bro
 - Videos and evidence go in the git-ignored folders `demo_videos/` and `evidence/`.
 
 ## Git
-- Phase 1 is on `main` (pushed to GitHub on 2026-11-18 at the owner's request). Make small commits. **Push or merge only when the owner asks.**
+- Phase 1 is on `main` (pushed to GitHub on 2026-11-18 at the owner's request). Phase 2 is on `phase2-history-auth` (pushed 2026-11-18, not merged). Make small commits. **Push or merge only when the owner asks.**
 
 ## Working while the owner is away
 - Do not stop to ask. Pick the safest reasonable option and log it in `docs/decisions.md`.

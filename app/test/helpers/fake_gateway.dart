@@ -5,7 +5,8 @@ import 'package:sensor_dashboard/core/mqtt/mqtt_gateway.dart';
 
 /// In-memory MQTT gateway for tests. No sockets.
 class FakeGateway implements MqttGateway {
-  final _messages = StreamController<RawMqttMessage>.broadcast();
+  // sync: messages reach the app immediately, so one pump() shows them.
+  final _messages = StreamController<RawMqttMessage>.broadcast(sync: true);
   final _lost = StreamController<void>.broadcast();
 
   /// When set, connect() waits on this completer (to test loading states).

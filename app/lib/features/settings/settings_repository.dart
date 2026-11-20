@@ -16,6 +16,7 @@ class SharedPrefsSettingsRepository implements SettingsRepository {
   static const _kHost = 'broker.host';
   static const _kPort = 'broker.port';
   static const _kPrefix = 'broker.prefix';
+  static const _kApiUrl = 'api.url';
   static const _kThresholds = 'alerts.thresholds';
   static const _kTheme = 'ui.themeMode';
 
@@ -26,6 +27,7 @@ class SharedPrefsSettingsRepository implements SettingsRepository {
       final host = prefs.getString(_kHost);
       final port = prefs.getInt(_kPort);
       final prefix = prefs.getString(_kPrefix);
+      final apiUrl = prefs.getString(_kApiUrl);
       final thresholdsJson = prefs.getString(_kThresholds);
       final themeIndex = prefs.getInt(_kTheme);
 
@@ -39,6 +41,9 @@ class SharedPrefsSettingsRepository implements SettingsRepository {
         topicPrefix: (prefix != null && SettingsValidator.prefix(prefix) == null)
             ? prefix
             : AppSettings.defaultPrefix,
+        apiUrl: (apiUrl != null && SettingsValidator.apiUrl(apiUrl) == null)
+            ? apiUrl
+            : AppSettings.defaultApiUrl,
         thresholds: thresholdsJson == null
             ? const AppSettings().thresholds
             : AppSettings.thresholdsFromJson(jsonDecode(thresholdsJson) as Map<String, dynamic>),
@@ -59,6 +64,7 @@ class SharedPrefsSettingsRepository implements SettingsRepository {
     await prefs.setString(_kHost, s.host);
     await prefs.setInt(_kPort, s.port);
     await prefs.setString(_kPrefix, s.topicPrefix);
+    await prefs.setString(_kApiUrl, s.apiUrl);
     await prefs.setString(_kThresholds, jsonEncode(s.thresholdsToJson()));
     await prefs.setInt(_kTheme, s.themeMode.index);
   }

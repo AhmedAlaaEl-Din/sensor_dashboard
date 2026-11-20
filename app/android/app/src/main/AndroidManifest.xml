@@ -1,6 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- TCP to the local MQTT broker (reached via adb reverse on 127.0.0.1). -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Alert notifications (asked at runtime on Android 13+). -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <application
         android:label="Sensor Dashboard"
         android:name="${applicationName}"

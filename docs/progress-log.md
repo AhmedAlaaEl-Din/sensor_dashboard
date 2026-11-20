@@ -1,5 +1,65 @@
 # Progress log
 
+## Phase 2 video, screenshots, push (2026-11-18, 21:10)
+
+- Uploaded `demo_videos/sensor_phase2_final.mp4` (your edit, 1:28, 720×1384) to YouTube as **unlisted**, not made for kids, title "sensor phase2 final", no description: https://youtube.com/shorts/ILTFeyNIfLA. Checks: no issues. Confirmed Unlisted in YouTube Studio → Content → Shorts.
+- README: Phase 2 video link and the 7 cropped screenshots (copied from git-ignored `evidence/screenshots/` to `docs/screenshots/` so GitHub can show them).
+- Pushed `phase2-history-auth` to origin at the owner's request (not merged).
+
+## Phase 2 follow-up: seed, re-recorded demo, MQTT reconnect fix (2026-11-18, 20:30–21:00)
+
+**Status:** done. Branch `phase2-history-auth`, **not pushed or merged**. API **33/33**, Flutter `analyze` clean, **86/86** tests.
+
+- 20:37: **Seed script** `api/scripts/seed-history.js` (`npm run seed`, logic in `api/src/seed.js`): 7 days × 1 reading/min × 3 devices = 30,240 rows; daily cycle, drift, noise, 5 short spikes; ends at the live simulator's values. It refuses when the DB has readings the API recorded (`meta.seed_until` marker) unless `--force`, and touches neither users nor thresholds. 8 new Vitest tests. Checked against the real DB: it refused (3,594 recorded readings, exit 1).
+- 20:38: **dev-up `-Seed` / `-Force`**: runs the seed before the API starts. Tested both: without `-Force` it warned and started anyway; with `-Force` it seeded 30,240 rows. README: new "Simulated history (seed)" section, dev-up options, limitation text.
+- 20:39: On the phone, 24 h showed a clean day/night curve and 7 d showed seven days. The last hour looked like a staircase (the easing removed the noise), so I added per-reading noise after the easing and reseeded.
+- 20:41: Take 1 of the re-recording was cut off at its 100 s limit during the outage. The run took 116 s because of adb round trips. The move of the old video to `-take1` failed (file locked by another program), so it was overwritten. That was the 2:45 take, which this request replaces anyway.
+- 20:44: Take 2: every step batched into one `adb shell` call (98 s). Complete, but it ran 118 s with a ~17 s idle tail.
+- 20:47: **Take 3 = final** `demo_videos/phase2-demo.mp4` (1:43, 720×1384, status bar cropped, no audio). Order: wrong password → viewer login → live dashboard → Greenhouse History 1 h → 24 h → 7 d → Export CSV → Done → Profile → sign out → admin login → temperature max 24 → heads-up + red banner → broker stopped ("Reconnecting…", "No connection") → broker restarted → "Live". Snapshots during the run confirmed each state. Only the broker was stopped (by its PID), so history kept working. Takes 1 and 2 were deleted.
+- 20:50: **Bug found in logcat during the outage:** `Unhandled Exception: SocketException: Connection reset by peer`, once per reconnect attempt. Cause: with the broker down, `adb reverse` accepts and then resets the connection. mqtt_client wrote CONNECT to the dead socket (the error came from its listener, not the `connect()` future) and waited 3 attempts × 4 s. Fix (decision 45): one attempt per connect, plus a `runZonedGuarded` that turns those errors into a failed attempt or a lost connection. Regression test with a local server that accepts and drops (it failed before the fix: hung for over 8 s). Rebuilt, reinstalled, and repeated the outage on the phone at 20:54: logcat shows handled "MQTT connect failed" lines only, and it reconnected by itself. (The video was recorded with the build before this fix; it looks the same.)
+- 20:56: **Clean-up.** The first Defaults → Save did **not** reach the server (still max 24): the heads-up notification covered the app bar, so my tap opened Greenhouse instead of Settings. I redid it step by step; checked with `GET /thresholds` that temperature is 5–35 again. Signed out. `dev-down -Phone`, `svc power stayon false`, `adb reverse --remove-all` (list empty), ports 1883 and 3000 free. Reseed without `--force` refused (2,922 recorded readings), so I ran `npm run seed -- --force`: the DB now holds exactly 10,080 seeded readings per device, ending 20:56, with default thresholds.
+- Also fixed: runbook lines where an earlier scripted edit had dropped the backslashes (`.scriptsdev-down.ps1`).
+
+## Phase 2 on-device session (2026-11-18, evening, phone authorized)
+
+**Status:** steps 5–7 are now **done**. Privacy: screenshots checked by eye, video **not frame-scanned** (no tools; see needs-me P2-3). Branch still **not pushed or merged**.
+
+- 19:46: `adb devices` shows the phone as `device`. Port 1883 was free: **Mosquitto is no longer listening** (needs-me P2-1 updated). Started `dev-up.ps1 -Phone -NoRandomSpikes`: broker 127.0.0.1:1883, API 127.0.0.1:3000, `adb reverse` for both. Installed the Phase 2 debug APK. Huawei DUB-LX1, Android 8.1, so no runtime notification permission is needed.
+- 19:51: Login screen OK. Wrong password → "Wrong email or password." (real API round trip over USB). `viewer-demo-pass` → dashboard, live.
+- 19:52: Greenhouse → History: 1 h (333 readings, 1-minute averages) and 24 h work. Export CSV → "CSV ready", 9 rows → Done (share sheet deliberately not opened). Profile shows Viewer with the auto sign-out time. Settings: thresholds greyed out for the viewer.
+- 19:54: Signed out, signed in as admin (the first try failed because of my adb typing, not the app; see the runbook note). Temperature max 35 → 24 → Save → **heads-up notification** "Greenhouse: temperature alert" plus the in-app banner.
+- 19:56: Outage: removing `adb reverse tcp:1883` did **not** drop the open MQTT connection. Stopping our services with `dev-down` showed "Reconnecting…", greyed values and "No connection". After `dev-up`, it went back to "Live" by itself.
+- **Two UI issues found on the device and fixed** (decisions 39–40): (1) the 24 h chart drew a straight line across the 11 hours when the API was off, so it now breaks the line at gaps; (2) the History title was cut off ("Greenhouse …"), so it is now the device name with "History" underneath. Added 3 unit tests. `flutter analyze` is clean, `flutter test` **85/85 passed** (the e2e test ran this time because our broker was on 1883). Rebuilt and reinstalled; checked on the phone at 20:02. After the reinstall, the session was restored from secure storage and the threshold of 24 came back from the server.
+- 20:03–20:06: Recorded `demo_videos/phase2-demo.mp4` (scrcpy 5.0.1, 2:45, 720×1384, status bar cropped, no audio, touches shown), driven by an adb script. Steps: viewer wrong/right password → Greenhouse history 24 h → export → profile → sign out → admin → threshold 24 → heads-up → outage → Live.
+- 20:06: Clean-up: thresholds put back to defaults as admin (Settings → Defaults → Save). Screenshots `evidence/screenshots/p2-01…p2-07` cropped (status and nav bars) and reviewed by eye. `dev-down -Phone`: services stopped, port forwards removed, stay-awake off. The app is left signed in as admin on the phone.
+
+## Phase 2 summary (2026-11-18, end of unattended run, branch `phase2-history-auth`)
+
+**Done**
+- **API** (`api/`, Node + Express 5 on **127.0.0.1:3000**): stores every MQTT reading in SQLite (`data/history.db`, git-ignored, indexed by device+time), 7-day retention job, `POST /auth/login` (bcrypt, 30-min HS256 JWT), `GET /devices`, history with raw/1m/15m/1h buckets, CSV export, shared thresholds (PUT admin-only), `DELETE` history (admin-only), login rate limit, zod validation, helmet headers, JSON-only errors. The JWT secret is generated into `api/.env` (git-ignored, never read or printed). Demo users: `admin@example.com`, `viewer@example.com`.
+- **App:** login screen, Profile with role, secure token storage, auto sign-out on expiry/resume/401, History (1 h/24 h/7 d, chart, min/avg/max, pull to refresh, loading/empty/error), Export CSV → "CSV ready" → share sheet, heads-up alert notifications (tap opens the device), role-aware thresholds synced with the server, developer hints moved to the README.
+- **Scripts:** `scripts/dev-up.ps1` and `scripts/dev-down.ps1` (tested: start, refused double start, stop only our PIDs; `-Phone` for adb reverse).
+- **Tests:** API Vitest **25/25**; Flutter `analyze` clean, `test` **81 passed, 1 skipped** (e2e skips because the broker on 1883 isn't ours, see risks); broker smoke **3/3**. The debug APK builds.
+- **Docs:** README (features, mermaid diagram simulator → broker → API + SQLite → app, API table, run steps, demo accounts, security notes, push-notification limitation, placeholders), `docs/phase2-explained.md`, Phase 2 runbook, decisions 21–38.
+- **Secrets scan** (110 tracked files): **clean.** No .env, keys, AIza, private_key, JWTs or real emails. The only hits are the code that *generates* the secret and a test using `Viewer@Example.com`.
+
+**Blocked**
+- **On-device steps 5–7** (install, recording, screenshots, cleanup): the phone shows **"unauthorized"** in `adb devices` (3 checks). It needs "Allow USB debugging?" accepted on the phone.
+- **Privacy scan (step 8): NOT SCANNED.** No video; tesseract and ffmpeg missing.
+
+**Needs me:** docs/needs-me.md P2-1 (an unrelated **Mosquitto listening on 0.0.0.0:1883**, reachable from your network), P2-2 (accept the USB debugging prompt, then record with the runbook), P2-3 (privacy check after recording), P2-4 (review and merge).
+
+**Videos / screenshots:** none for Phase 2. Phase 1 assets are unchanged in `demo_videos/` and `evidence/screenshots/` (git-ignored).
+
+**Risks**
+- The Phase 2 app has **not run on a real phone yet**. Phase 1 found a real-device-only bug (the client-id length), so expect possible device issues: notification permission, secure storage on Huawei EMUI, share sheet.
+- **The Mosquitto on 0.0.0.0:1883** is outside this project: it is exposed to your network, and if our broker stops, the app and API silently connect to it.
+- **compileSdk 37** and brand-new plugin versions (flutter_local_notifications 23) on a very new toolchain.
+- **Background alerts** depend on Android keeping the app alive (documented; no FCM by design).
+- **The broker has no auth or TLS**, and the API is HTTP. That is safe only because everything binds to loopback.
+
+---
+
 ## Summary (2026-11-17, end of unattended run)
 
 **Done**
@@ -58,3 +118,15 @@
 - Leftover on the phone: the app is installed with temperature max = 24 saved from the demo. Settings → Defaults → Save resets it.
 - 2026-11-18: Added GitHub remote `origin` (https://github.com/AhmedAlaaEl-Din/sensor_dashboard.git; remote is empty, nothing pushed). Uploaded `demo_videos/sensor_dashboard_demo_final.mp4` (owner's final cut, 1:07) to the owner's YouTube channel at the owner's request: unlisted, not made for kids, description 'This video shows a demo for sensor dashboard'. Link: https://youtube.com/shorts/mwZjokxNZyg. Added to README.
 - 2026-11-18: Owner asked to push. There was only one branch, so it was renamed `phase1-foundation` → `main` and pushed with `git push -u origin main`. The secrets re-scan before the push was clean. No PR/merge was needed. CLAUDE.md git rule updated.
+
+---
+
+# Phase 2: login, history, export and alerts
+
+## Log
+- 2026-11-18 07:38: Created branch `phase2-history-auth` from `main`. `adb devices` shows the phone as **unauthorized**: the USB-debugging prompt on the phone has not been accepted. I'll re-check later. tesseract and ffmpeg are still missing.
+- 2026-11-18 07:45: Finished the API (`api/`): MQTT ingest into SQLite (`data/history.db`, indexed by device+time), login/JWT, devices, history with buckets, CSV export, thresholds, admin-only delete, retention job, helmet, rate limit, zod validation, JSON-only errors. Vitest: **25/25 passed**. A live check against the real broker worked: wrong password gives 401, viewer login works, 3 devices listed, history and CSV OK. The API listens on 127.0.0.1:3000 only. `api/.env` was generated (not read) and is git-ignored. **Found** an unrelated Mosquitto on 0.0.0.0:1883 (needs-me P2-1).
+- 2026-11-18 07:52: Added `scripts/dev-up.ps1` (starts broker, simulator and API; waits for 127.0.0.1 listeners; warns about other listeners on 1883/3000; `-Phone` adds adb reverse 1883+3000; `-NoRandomSpikes`) and `scripts/dev-down.ps1` (stops only the PIDs it started; `-Phone` removes adb reverse and turns stay-awake off). Tested: start, a refused second start, stop. They run under the existing RemoteSigned policy; an `-ExecutionPolicy Bypass` invocation was blocked by the permission system, and the docs don't use it.
+- 2026-11-18 08:03: Finished the Flutter Phase 2 work: login screen (server settings link), Profile (role, session end, sign out), secure token storage, auto sign-out, History screen (1 h/24 h/7 d, chart, min/avg/max, pull to refresh, loading/empty/error), CSV export with the share sheet, local alert notifications (tap opens the device), server-synced role-aware thresholds, developer hints moved out of the UI. `flutter analyze` clean; `flutter test` **81 passed, 1 skipped** (e2e). The debug APK builds after compileSdk 37 and desugaring.
+- 2026-11-18 08:06: Docs: rewrote README.md (features, mermaid diagram simulator → broker → API + SQLite → app, API table, run steps with dev-up/dev-down, demo accounts, security notes protected vs demo-only, push-notification limitation, placeholders). Added docs/phase2-explained.md and a Phase 2 section in docs/demo-runbook.md.
+- 2026-11-18 08:08: Secrets scan of 110 tracked files: clean (details in the summary). Final runs: API 25/25, broker 3/3, Flutter analyze clean, 81 passed + 1 skipped. The phone is still unauthorized (3rd check). Nothing of ours is left listening (only the unrelated Mosquitto on 0.0.0.0:1883).

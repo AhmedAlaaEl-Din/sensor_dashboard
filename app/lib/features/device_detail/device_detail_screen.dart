@@ -6,6 +6,7 @@ import '../../core/widgets/state_views.dart';
 import '../alerts/alerts_controller.dart';
 import '../alerts/widgets/alert_banner.dart';
 import '../connection/widgets/connection_status_bar.dart';
+import '../history/history_screen.dart';
 import '../telemetry/device_store.dart';
 import '../telemetry/models/sensor_type.dart';
 import '../telemetry/models/telemetry.dart';
@@ -30,7 +31,19 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
     final device = store.device(widget.deviceId);
 
     return Scaffold(
-      appBar: AppBar(title: Text(displayNameFor(widget.deviceId))),
+      appBar: AppBar(
+        title: Text(displayNameFor(widget.deviceId)),
+        actions: [
+          TextButton.icon(
+            key: const Key('open-history'),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => HistoryScreen(deviceId: widget.deviceId)),
+            ),
+            icon: const Icon(Icons.history),
+            label: const Text('History'),
+          ),
+        ],
+      ),
       body: Column(
         children: [
           const ConnectionStatusBar(),
