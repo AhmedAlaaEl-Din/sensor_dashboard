@@ -1,5 +1,9 @@
 # Progress log
 
+## Merge (2026-11-20)
+
+- Merged `phase2-history-auth` into `main` (merge commit, no conflicts; main had no extra commits) and pushed both branches at the owner's request. On merged main: API 33/33, Flutter analyze clean, 85 passed + 1 skipped (e2e skips with no broker running).
+
 ## Phase 2 video, screenshots, push (2026-11-18, 21:10)
 
 - Uploaded `demo_videos/sensor_phase2_final.mp4` (your edit, 1:28, 720×1384) to YouTube as **unlisted**, not made for kids, title "sensor phase2 final", no description: https://youtube.com/shorts/ILTFeyNIfLA. Checks: no issues. Confirmed Unlisted in YouTube Studio → Content → Shorts.

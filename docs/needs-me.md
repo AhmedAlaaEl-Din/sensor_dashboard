@@ -66,5 +66,5 @@ appeared in between. **Watch it once before publishing.** Full check:
 3. Watch every frame with a notification banner: it must be ours, never another app's.
 4. Check that the status bar is cropped off in the video and screenshots.
 
-## P2-4. Review and merge
+## ~~P2-4. Review and merge~~ (DONE 2026-11-20: merged into main and pushed)
 All Phase 2 work is on `phase2-history-auth`, pushed to GitHub on 2026-11-18 at your request, **not merged**.
